@@ -9,7 +9,7 @@ window.onload = function(){
   if (localStorage.getItem("token")) {
     view = document.getElementById("loggedinview").innerHTML;
   }else {
-    view = document.getElementById("welcomview").innerHTML;
+    view = document.getElementById("welcomeview").innerHTML;
   }
   document.getElementById("content").innerHTML = view;
 
@@ -61,4 +61,14 @@ functionsignin = function(){
   localStorage.setItem("token", message["data"]);
 
   return message["success"];
+};
+
+functionMenu = function(){
+
+};
+functionBrowse = function(){
+
+};
+functionAccount = function(){
+
 };

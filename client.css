@@ -90,27 +90,74 @@ loggedinview
 	width: 1000px;
 	height: 70px;
 	margin-top: 100px;
-	border: 1px solid;
-	background-color: #ffffff;
-}
+	background-color: #ff3300;
+	color:white;
+	border-radius: 25px;
+	text-transform: uppercase;
+
+	}
 
 #home{
+	border: none;
 	float: left;
 	height: 70px;
-	border: 1px solid;
+	width : 100%;
+	text-align: center;
+	border-top-left-radius: 25px;
+	border-bottom-left-radius: 25px;
+	background-color: #ff3300;
+	outline:none;
+}
+#home:hover{
+	background-color: #0033cc;
+	cursor:pointer;
+}
+#home:focus{
+	background-color: #0033cc;
 }
 
+
 #browse{
+	border: none;
 	float: left;
 	height: 70px;
-	border: 1px solid;
+	width : 100%;
+	text-align: center;
+	background-color: #ff3300;
+	outline:none;
+}
+#browse:hover{
+	background-color: #0033cc;
+	cursor:pointer;
+}
+#browse:focus{
+	background-color: #0033cc;
 }
 
 #account{
+	border: none;
 	float: left;
 	height: 70px;
-	border: 1px solid;
+	width : 100%;
+	text-align: center;
+	border-top-right-radius: 25px;
+	border-bottom-right-radius: 25px;
+	background-color: #ff3300;
+	outline:none;
 }
+#account:hover{
+	background-color: #0033cc;
+	cursor:pointer;
+}
+#account:focus{
+	background-color: #0033cc;
+}
+
+#menudiv{
+	float:left;
+	width : 33.33%;
+}
+
 .inner{
 
 }
