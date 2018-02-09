@@ -96,13 +96,42 @@
 
         <div id="menu" >
           <div id="menudiv">
-            <button id="home" ><h1>Home</h1></button>
+            <button id="home" onclick="functionHome();"><h1>Home</h1></button>
           </div>
           <div id="menudiv">
-            <button id="browse" ><h1>Home</h1></button>
+            <button id="browse" onclick="functionBrowse();"><h1>Browse</h1></button>
           </div>
           <div id="menudiv">
-            <button id="account" ><h1>Home</h1></button>
+            <button id="account" onclick="functionAccount();"><h1>Account</h1></button>
+          </div>
+        </div>
+
+        <div id="area">
+          <div id="homeArea">
+            home
+          </div>
+
+          <div id="browseArea">
+            browse
+          </div>
+
+          <div id="accountArea">
+            <h1>Change password</h1>
+            <form method="POST" action="" id="changePassword" onsubmit="functionchangepsw();return false">
+              <div class="inner">
+                <div class="row">
+                  <input type="password" id="oldPassword" placeholder="Old password" pattern=".{6,}" required title="6 or more characters"></input>
+                  <input type="password" id="newPassword" placeholder="New password" pattern=".{6,}" required title="6 or more characters"></input>
+                  <input type="password" id="newPasswordrpt" placeholder="Repeat password" pattern=".{6,}" required title="6 or more characters"> </input>
+                </div>
+                <div class="row">
+                  <button type="submit">submit </button>
+                </div>
+                <div class="row">
+                  <label for="errormes" id="changepswerr" ></label>
+                </div>
+              </div>
+            </form>
           </div>
         </div>
     </script>
@@ -115,6 +144,7 @@
 <div id="content">
 
 </div>
+
 
 
 </body>

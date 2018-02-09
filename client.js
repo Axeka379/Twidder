@@ -63,12 +63,40 @@ functionsignin = function(){
   return message["success"];
 };
 
-functionMenu = function(){
-
+functionHome = function(){
+  document.getElementById("homeArea").style.display = "inline";
+  document.getElementById("browseArea").style.display = "none";
+  document.getElementById("accountArea").style.display = "none";
 };
 functionBrowse = function(){
-
+  document.getElementById("homeArea").style.display = "none";
+  document.getElementById("browseArea").style.display = "inline";
+  document.getElementById("accountArea").style.display = "none";
 };
 functionAccount = function(){
-
+  document.getElementById("homeArea").style.display = "none";
+  document.getElementById("browseArea").style.display = "none";
+  document.getElementById("accountArea").style.display = "inline";
 };
+
+functionchangepsw = function(){
+  var oldpass = document.getElementById("oldPassword").value;
+  var pass1 = document.getElementById("newPassword").value;
+  var pass2 = document.getElementById("newPasswordrpt").value;
+
+  console.log(pass1);
+  console.log(pass2);
+  if (pass1 === pass2) {
+    if(oldpass != pass1){
+      var error = serverstub.changePassword(localStorage.getItem("token"), oldpass, pass1);
+      document.getElementById("changepswerr").innerHTML = error["message"];
+    }else{
+      document.getElementById("changepswerr").innerHTML = "password can't be the same as the old";
+    }
+
+  }else {
+    document.getElementById("changepswerr").innerHTML = "new password don't match!";
+  }
+
+    //document.getElementById("changepswerr").innerHTML = "error here";
+}
