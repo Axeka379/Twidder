@@ -5,13 +5,39 @@ displayView = function(){
 window.onload = function(){
 
   var view;
-
+  var homeview;
   if (localStorage.getItem("token")) {
     view = document.getElementById("loggedinview").innerHTML;
+    var info = serverstub.getUserDataByToken(localStorage.getItem("token"));
+    homeview = "<table style ='width:20%'>" +
+      "<tr>" +
+        "<th>Email: </th> <td> " + info["data"].email +" </td> " +
+      "</tr>" +
+      "<tr>" +
+        "<th>First name: </th> <td> " + info["data"].firstname +" </td> " +
+      "</tr>" +
+      "<tr>" +
+        "<th>Last name: </th> <td> " + info["data"].familyname +" </td> " +
+      "</tr>" +
+      "<tr>" +
+        "<th>Gender: </th> <td> " + info["data"].gender +" </td> " +
+      "</tr>" +
+      "<tr>" +
+        "<th>City: </th> <td> " + info["data"].city +" </td> " +
+      "</tr>" +
+      "<tr>" +
+        "<th>Country: </th> <td> " + info["data"].country +" </td> " +
+      "</tr>" +
+      "</table>";
+
+
   }else {
     view = document.getElementById("welcomeview").innerHTML;
   }
   document.getElementById("content").innerHTML = view;
+  var oldview = document.getElementById("homeArea").innerHTML;
+  document.getElementById("homeArea").innerHTML = homeview + oldview;
+
 
 
   //code that is executed as the page is loaded.
@@ -88,8 +114,8 @@ functionchangepsw = function(){
   console.log(pass2);
   if (pass1 === pass2) {
     if(oldpass != pass1){
-      var error = serverstub.changePassword(localStorage.getItem("token"), oldpass, pass1);
-      document.getElementById("changepswerr").innerHTML = error["message"];
+      var message = serverstub.changePassword(localStorage.getItem("token"), oldpass, pass1);
+      document.getElementById("changepswerr").innerHTML = message["message"];
     }else{
       document.getElementById("changepswerr").innerHTML = "password can't be the same as the old";
     }
@@ -99,4 +125,21 @@ functionchangepsw = function(){
   }
 
     //document.getElementById("changepswerr").innerHTML = "error here";
+}
+
+
+functionlogout = function(){
+  localStorage.removeItem("token");
+  view = document.getElementById("welcomeview").innerHTML;
+  document.getElementById("content").innerHTML = view;
+}
+
+functionuploadmes = function(){
+  var text = document.getElementById("submittext").value;
+  console.log(text);
+  var email = serverstub.getUserDataByToken(localStorage.getItem("token"))["data"].email;
+  console.log(email);
+  serverstub.postMessage(localStorage.getItem("token"), text, email)
+  document.getElementById("submittext").value = "";
+
 }

@@ -116,6 +116,27 @@ loggedinview
 	background-color: #0033cc;
 }
 
+#submitmessage{
+	margin:auto;
+	width: 580;
+	text-align: center;
+}
+
+#submittext{
+	resize: none;
+}
+
+#wall{
+	width: 815px;
+	margin:auto;
+	text-align: center;
+}
+
+#thewall{
+	margin-top: 25px;
+	resize: none;
+	cursor: default;
+}
 
 #browse{
 	border: none;
@@ -216,6 +237,11 @@ div#accountArea h1{
 #changepswerr{
 	display: block;
 	text-align: center;
+}
+
+#signoutbutton{
+	float:right;
+	margin-right: 20px;
 }
 
 

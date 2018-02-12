@@ -94,6 +94,10 @@
 
     <script type="text/view" id="loggedinview">
 
+
+
+
+
         <div id="menu" >
           <div id="menudiv">
             <button id="home" onclick="functionHome();"><h1>Home</h1></button>
@@ -106,14 +110,34 @@
           </div>
         </div>
 
+
+
+
+
+
         <div id="area">
           <div id="homeArea">
-            home
+
+              <form method="POST" action="" id="submitmessage" onsubmit="functionuploadmes(); return false;">
+                <textarea id="submittext"rows="13" cols="70">
+                </textarea>
+                <button type="submit">submit</button>
+              </form>
+
+            <div id="wall">
+              <textarea id="thewall" rows="38" cols="100"readonly> </textarea>
+              <button onclick="somefunction(); return false;"> Reload</button>
+            </div>
+
           </div>
 
           <div id="browseArea">
             browse
           </div>
+
+
+
+
 
           <div id="accountArea">
             <h1>Change password</h1>
@@ -132,6 +156,8 @@
                 </div>
               </div>
             </form>
+
+            <button id="signoutbutton" onclick="functionlogout();">Sign out</button>
           </div>
         </div>
     </script>
