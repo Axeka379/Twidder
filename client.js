@@ -9,6 +9,7 @@ window.onload = function(){
   if (localStorage.getItem("token")) {
     view = document.getElementById("loggedinview").innerHTML;
     var info = serverstub.getUserDataByToken(localStorage.getItem("token"));
+
     homeview = "<table style ='width:20%'>" +
       "<tr>" +
         "<th>Email: </th> <td> " + info["data"].email +" </td> " +
@@ -30,13 +31,17 @@ window.onload = function(){
       "</tr>" +
       "</table>";
 
+      document.getElementById("content").innerHTML = view;
+      var oldview = document.getElementById("homeArea").innerHTML;
+      document.getElementById("homeArea").innerHTML = homeview + oldview;
+      functionReloadMessage();
 
   }else {
-    view = document.getElementById("welcomeview").innerHTML;
+    document.getElementById("content").innerHTML = document.getElementById("welcomeview").innerHTML;
   }
-  document.getElementById("content").innerHTML = view;
-  var oldview = document.getElementById("homeArea").innerHTML;
-  document.getElementById("homeArea").innerHTML = homeview + oldview;
+
+
+
 
 
 
@@ -151,9 +156,16 @@ functionReloadMessage = function()
 //var receivedText = serverstub.getUserMessagesByEmail(localStorage.getItem("token"))["data"].email;
 console.log("Testing functionReloadMessage")
 var receivedText = serverstub.getUserMessagesByToken(localStorage.getItem("token"));
+var messageArray = receivedText["data"];
+var chatArea = document.getElementById("thewall");
+chatArea.innerHTML = "";
+var i = messageArray.length -1;
+for (i; i >= 0; i--) {
+  console.log(messageArray[i].writer);
+  console.log(messageArray[i].content);
+  chatArea.innerHTML += messageArray[i].writer + ": " + messageArray[i].content + "\n";
 
-console.log(receivedText["data"][0].writer);
-console.log(receivedText["data"][0].content);
+}
 
 
 //console.log(receivedText);
