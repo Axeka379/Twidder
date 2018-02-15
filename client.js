@@ -141,5 +141,29 @@ functionuploadmes = function(){
   console.log(email);
   serverstub.postMessage(localStorage.getItem("token"), text, email)
   document.getElementById("submittext").value = "";
+  insertText(email, text);
 
+}
+
+functionReloadMessage = function()
+{
+
+//var receivedText = serverstub.getUserMessagesByEmail(localStorage.getItem("token"))["data"].email;
+console.log("Testing functionReloadMessage")
+var receivedText = serverstub.getUserMessagesByToken(localStorage.getItem("token"));
+
+console.log(receivedText["data"][0].writer);
+console.log(receivedText["data"][0].content);
+
+
+//console.log(receivedText);
+
+}
+
+insertText = function(author, text)
+{
+ var elem = document.getElementById("thewall");
+ elem.innerHTML += author + ': ' + text + '\n';
+ //elem.innerHTML += text;
+ //elem.innerHTML += "\n";
 }

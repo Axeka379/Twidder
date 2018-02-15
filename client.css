@@ -136,6 +136,7 @@ loggedinview
 	margin-top: 25px;
 	resize: none;
 	cursor: default;
+	text-align: left;
 }
 
 #browse{
