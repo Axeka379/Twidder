@@ -198,7 +198,18 @@ loggedinview
 
 #browseArea{
 	display: none;
+	width: 100%;
+
 }
+#browseArea button{
+	margin-left: 40%	;
+	margin-top: 20px;
+	}
+#browseArea input{
+margin-left: 40%;
+margin-top: 20px;
+}
+
 
 #accountArea{
 	display: none;

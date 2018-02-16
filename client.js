@@ -153,22 +153,17 @@ functionuploadmes = function(){
 functionReloadMessage = function()
 {
 
-//var receivedText = serverstub.getUserMessagesByEmail(localStorage.getItem("token"))["data"].email;
-console.log("Testing functionReloadMessage")
-var receivedText = serverstub.getUserMessagesByToken(localStorage.getItem("token"));
-var messageArray = receivedText["data"];
-var chatArea = document.getElementById("thewall");
-chatArea.innerHTML = "";
-var i = messageArray.length -1;
-for (i; i >= 0; i--) {
-  console.log(messageArray[i].writer);
-  console.log(messageArray[i].content);
-  chatArea.innerHTML += messageArray[i].writer + ": " + messageArray[i].content + "\n";
-
-}
-
-
-//console.log(receivedText);
+  console.log("Testing functionReloadMessage")
+  var receivedText = serverstub.getUserMessagesByToken(localStorage.getItem("token"));
+  var messageArray = receivedText["data"];
+  var chatArea = document.getElementById("thewall");
+  chatArea.innerHTML = "";
+  var i = messageArray.length -1;
+  for (i; i >= 0; i--) {
+  //  console.log(messageArray[i].writer);
+    //console.log(messageArray[i].content);
+    insertText(messageArray[i].writer, messageArray[i].content);
+  }
 
 }
 
@@ -176,6 +171,10 @@ insertText = function(author, text)
 {
  var elem = document.getElementById("thewall");
  elem.innerHTML += author + ': ' + text + '\n';
- //elem.innerHTML += text;
- //elem.innerHTML += "\n";
+
+}
+
+functionBrowseUser = function()
+{
+  console.log("Testing functionBrowseUser");
 }
