@@ -29,7 +29,7 @@
 
                 </div>
                 <div class="inner" id="button">
-                        <button type="submit" value="login" name="login" id="loginButton" >login</button>
+                        <input type="submit" value="login" name="login" id="loginButton" ></button>
                         <label for="errormes" id="signinerror" ></label>
                 </div>
             </form>
@@ -83,7 +83,7 @@
 
                 </div>
                 <div class="inner" id="button">
-                        <button type="submit" value="send" name="signup" id="signupbutton">Signup</button>
+                        <input type="submit" value="Signup" name="signup" id="signupbutton"></button>
                         <label for="errormes" id="signuperror" ></label>
                 </div>
             </form>
@@ -92,10 +92,8 @@
 	</div>
     </script>
 
+
     <script type="text/view" id="loggedinview">
-
-
-
 
 
         <div id="menu" >
@@ -116,12 +114,14 @@
 
 
         <div id="area">
+
+
           <div id="homeArea">
 
               <form method="POST" action="" id="submitmessage" onsubmit="functionuploadmes(); return false;">
                 <textarea id="submittext"rows="13" cols="70" value=" ">
                 </textarea>
-                <button type="submit">submit</button>
+                <input type="submit"></button>
               </form>
 
             <div id="wall">
@@ -131,19 +131,23 @@
 
           </div>
 
+
+
           <div id="browseArea">
-            <input type="search" id="searchUser" placeholder="username" pattern=".{6}">
-            <button id="searchUserButton" onclick="functionBrowseUser();">Search User</button>
+
+            <form id="submitSearch" onsubmit="functionBrowseUser(); return false;">
+              <input type="email" id="searchUser" placeholder="email" required>
+              <input type="submit" id="searchUserButton" value="Search">
+            </form>
 
           </div>
 
 
 
 
-
           <div id="accountArea">
             <h1>Change password</h1>
-            <form method="POST" action="" id="changePassword" onsubmit="functionchangepsw();return false">
+            <form id="changePassword" onsubmit="functionchangepsw(); return false;">
               <div class="inner">
                 <div class="row">
                   <input type="password" id="oldPassword" placeholder="Old password" pattern=".{6,}" required title="6 or more characters"></input>
@@ -151,7 +155,7 @@
                   <input type="password" id="newPasswordrpt" placeholder="Repeat password" pattern=".{6,}" required title="6 or more characters"> </input>
                 </div>
                 <div class="row">
-                  <button type="submit">submit </button>
+                  <input type="submit"></button>
                 </div>
                 <div class="row">
                   <label for="errormes" id="changepswerr" ></label>
@@ -163,6 +167,35 @@
           </div>
         </div>
     </script>
+
+
+
+
+
+    <script type="text/view" id="browseProfile">
+      <form id="submitSearch" onsubmit="functionBrowseUser(); return false;">
+        <input type="email" id="searchUser" placeholder="email" required>
+        <input type="submit" id="searchUserButton" value="Search">
+      </form>
+
+      <div id="information">
+      </div>
+
+
+      <form id="submitmessage" onsubmit="sendMessageToEmail(); return false;">
+        <textarea id="submittexttouser"rows="13" cols="70" value=" ">
+        </textarea>
+        <button type="submit">submit</button>
+      </form>
+
+      <div id="wallOther">
+        <textarea id="thewallOther" rows="38" cols="100"readonly> </textarea>
+        <button onclick="functionReloadMessage();"> Reload</button>
+      </div>
+    </script>
+
+
+
 
 <!--    <script src="gdfg.js" type="text/javascript"></script>> </!-->
 </head>

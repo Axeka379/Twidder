@@ -10,26 +10,7 @@ window.onload = function(){
     view = document.getElementById("loggedinview").innerHTML;
     var info = serverstub.getUserDataByToken(localStorage.getItem("token"));
 
-    homeview = "<table style ='width:20%'>" +
-      "<tr>" +
-        "<th>Email: </th> <td> " + info["data"].email +" </td> " +
-      "</tr>" +
-      "<tr>" +
-        "<th>First name: </th> <td> " + info["data"].firstname +" </td> " +
-      "</tr>" +
-      "<tr>" +
-        "<th>Last name: </th> <td> " + info["data"].familyname +" </td> " +
-      "</tr>" +
-      "<tr>" +
-        "<th>Gender: </th> <td> " + info["data"].gender +" </td> " +
-      "</tr>" +
-      "<tr>" +
-        "<th>City: </th> <td> " + info["data"].city +" </td> " +
-      "</tr>" +
-      "<tr>" +
-        "<th>Country: </th> <td> " + info["data"].country +" </td> " +
-      "</tr>" +
-      "</table>";
+    homeview = profileInfo(info);
 
       document.getElementById("content").innerHTML = view;
       var oldview = document.getElementById("homeArea").innerHTML;
@@ -50,6 +31,34 @@ window.onload = function(){
   //window.alert() is not allowed to be used in your implementation.
   //window.alert("Hello TDDD97!");
 };
+
+
+profileInfo = function(info){
+
+  var view = "<table style ='width:20%'>" +
+    "<tr>" +
+      "<th>Email: </th> <td> " + info["data"].email +" </td> " +
+    "</tr>" +
+    "<tr>" +
+      "<th>First name: </th> <td> " + info["data"].firstname +" </td> " +
+    "</tr>" +
+    "<tr>" +
+      "<th>Last name: </th> <td> " + info["data"].familyname +" </td> " +
+    "</tr>" +
+    "<tr>" +
+      "<th>Gender: </th> <td> " + info["data"].gender +" </td> " +
+    "</tr>" +
+    "<tr>" +
+      "<th>City: </th> <td> " + info["data"].city +" </td> " +
+    "</tr>" +
+    "<tr>" +
+      "<th>Country: </th> <td> " + info["data"].country +" </td> " +
+    "</tr>" +
+    "</table>";
+
+    return view;
+}
+
 
 functionsignup = function(){
   var pass1 = document.getElementById("passwordsignup").value;
@@ -146,14 +155,14 @@ functionuploadmes = function(){
   console.log(email);
   serverstub.postMessage(localStorage.getItem("token"), text, email)
   document.getElementById("submittext").value = "";
-  insertText(email, text);
+  insertText(email, text, "thewall");
 
 }
 
 functionReloadMessage = function()
 {
 
-  console.log("Testing functionReloadMessage")
+  //console.log("Testing functionReloadMessage")
   var receivedText = serverstub.getUserMessagesByToken(localStorage.getItem("token"));
   var messageArray = receivedText["data"];
   var chatArea = document.getElementById("thewall");
@@ -162,19 +171,47 @@ functionReloadMessage = function()
   for (i; i >= 0; i--) {
   //  console.log(messageArray[i].writer);
     //console.log(messageArray[i].content);
-    insertText(messageArray[i].writer, messageArray[i].content);
+    insertText(messageArray[i].writer, messageArray[i].content, "thewall");
   }
 
 }
 
-insertText = function(author, text)
+insertText = function(author, text, wall)
 {
- var elem = document.getElementById("thewall");
+ var elem = document.getElementById(wall);
  elem.innerHTML += author + ': ' + text + '\n';
 
 }
 
 functionBrowseUser = function()
 {
+  var email = document.getElementById("searchUser").value;
+  //localStorage.removeItem("browse");
+  localStorage.setItem("browse", email);
+
+  info = serverstub.getUserDataByEmail(localStorage.getItem("token"), email);
+  if (info["success"]) {
+    //document.body.appendChild(document.getElementById("submitSearch"));
+    //profileInfo(info)
+    document.getElementById("browseArea").innerHTML = document.getElementById("browseProfile").innerHTML;
+    document.getElementById("information").innerHTML = profileInfo(info);
+  }else {
+    //error message
+    console.log(info["message"]);
+  }
+
+
+
   console.log("Testing functionBrowseUser");
+  console.log(document.getElementById("searchUser").value);
+}
+
+sendMessageToEmail = function(){
+  var text = document.getElementById("submittexttouser").value;
+  console.log(text);
+  var email = localStorage.getItem("browse");
+  console.log(email);
+  serverstub.postMessage(localStorage.getItem("token"), text, email)
+  document.getElementById("submittext").value = "";
+  insertText(serverstub.getUserDataByToken(localStorage.getItem("token"))["data"].email, text, "thewallOther");
 }
