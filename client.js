@@ -176,6 +176,23 @@ functionReloadMessage = function()
 
 }
 
+functionReloadMessageOther = function()
+{
+
+  //console.log("Testing functionReloadMessage")
+  var receivedText = serverstub.getUserMessagesByEmail(localStorage.getItem("token"),localStorage.getItem("browse"));
+  var messageArray = receivedText["data"];
+  var chatArea = document.getElementById("thewallOther");
+  chatArea.innerHTML = "";
+  var i = messageArray.length -1;
+  for (i; i >= 0; i--) {
+  //  console.log(messageArray[i].writer);
+    //console.log(messageArray[i].content);
+    insertText(messageArray[i].writer, messageArray[i].content, "thewallOther");
+  }
+
+}
+
 insertText = function(author, text, wall)
 {
  var elem = document.getElementById(wall);
@@ -197,8 +214,11 @@ functionBrowseUser = function()
     document.getElementById("information").innerHTML = profileInfo(info);
   }else {
     //error message
+    document.getElementById("searchError").innerHTML = info["message"];
     console.log(info["message"]);
   }
+
+
 
 
 

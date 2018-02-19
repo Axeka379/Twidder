@@ -132,7 +132,17 @@ loggedinview
 	text-align: center;
 }
 
+
+
 #thewall{
+	margin-top: 25px;
+	resize: none;
+	cursor: default;
+	text-align: left;
+}
+
+
+#thewallOther{
 	margin-top: 25px;
 	resize: none;
 	cursor: default;
