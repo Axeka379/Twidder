@@ -1,0 +1,16 @@
+<div id="menu" >
+  <div id="home" tabindex="1" onclick="functionMenu();">
+  <button id="testing" ><h1>Home</h1></button>
+    <h1>Home</h1>
+  </div>
+
+  <div id="browse" tabindex="2" onclick="functionBrowse();">
+    <h1>Browse</h1>
+  </div>
+  <button id="testing" ><h1>Home</h1></button>
+
+  <div id="account" tabindex="3" onclick="functionAccount();">
+    <h1>Account</h1>
+  </div>
+  <button id="testing" ><h1>Home</h1></button>
+</div>
