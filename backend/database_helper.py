@@ -1,22 +1,22 @@
+from flask import Flask, current_app
 import sqlite3
 from flask import g
 
+app = Flask(__name__)
 
-
-my_db = 'database.db'
+DATABASE = './database.db'
+#/home/malbr878/TDDD97/backend/database.db
 
 #connect to database
 def connect_db():
-	db = getattr(g, '_database', None)
-	if db is None:
-		db = g._database = sqlite3.connect(my_db)
-	return db
+	print("Connected")
+	g.db = sqlite3.connect(DATABASE)
 
-#closes database when teardown
-@app.teardown_appcontext
-def close_connection_db(exception):
-	db = getattr(g, '_database', None)
-	if fb is not None:
+
+#closes database
+def close_connection_db():
+	db = getattr(g, 'db', None)
+	if db is not None:
 		db.close()
 
 def query_db(query, args=(), one=False):
@@ -27,40 +27,49 @@ def query_db(query, args=(), one=False):
 
 
 #insert a user into the database
-def insert_user(): #lägg till parametrar (prob json)
-	connect = connect_db()
+def insert_user(email, firstname, familyname, password, sex, city, country, token):
+	#do we need this? result = []
 
-	cursor = connect.cursor()
-	cursor.execute('''INSERT INTO users(email,firstname,familyname,password,sex,city,country,token)
-						VALUES(?,?,?,?,?,?,?,?)''', (email, firstname, familyname, password, sex, city, country, token))
-	connect.commit()
-	#close cursor ???
-	return cursor.lastrowid
+	try:
+		cursor = g.db.execute("INSERT INTO users VALUES(?,?,?,?,?,?,?,?)" , [email, firstname, familyname, password, sex, city, country, token])
+		g.db.commit()
+
+		return True
+	except:
+		return False
 
 #find a user from the database
-def find_user(): #lägg till parametrar
-	user = query_db('select * from users where email = ?',
-				[email], one=true)
-	if user is None: #Change to json message, success = false and so on
-		print ('Couldn\'t find user')
-	else:
-		print ('found the user', user['email'])
-	return user #kan behöva ändras. Vad är user exakt?
+def find_user(email):
+	result = []
+	cursor = g.db.execute("select * from users where email = ?", [email])
+	#commit
+	rows = cursor.fetchall()
+	cursor.close()
+	for index in range(len(rows)):
+		result.append({'email':rows[index][0], 'firstname':rows[index][0],
+			'familyname':rows[index][0], 'password':rows[index][0],
+			'sex':rows[index][0], 'city':rows[index][0],
+			'country':rows[index][0], 'token':rows[index][0]})
+	return result
 
 
-def remove_user(): #lägg till parametrar
+def remove_user(email):
 	connect = connect_db()
 
-	cursor = connect.cursor()
-	cursor.execute('''DELETE FROM users WHERE email =?''', (email))
-	connect.commit()
-	#close cursor ???
+	cursor = g.db.execute("DELETE FROM users WHERE email =?", [email])
+	g.db.commit()
 	return cursor.lastrowid
 
-def create_post(): #lägg till parametrar
-	connect = connect_db()
-	cursor.execute('''INSERT INTO messages(sender, message, receiver)
-						VALUES(?,?,?)''', (email1, text, email2))
-	connect.commit()
-	#close cursor ???
-	return cursor.lastrowid
+def create_post(sender, message, receiver):
+	#do we need this? result = []
+	try:
+		cursor = g.db.execute("INSERT INTO messages VALUES(?,?,?)" , [sender, message, receiver])
+		g.db.commit()
+		return True
+	except:
+		return False
+
+with app.app_context():
+	connect_db()
+	insert_user('malte1@malte2', 'Malte', 'Brolund', 'asdasd', 1, 'Kristinehamn', 'Sweden', 'asdasdasd')
+	close_connection_db
