@@ -69,6 +69,12 @@ def create_post(sender, message, receiver):
 	except:
 		return False
 
+def check_password(email, password):
+	cursor = g.db.execute("SELECT password FROM users WHERE email = ?", [email])
+	passwrd = cursor.fetchall()
+	cursor.close()
+	return passwrd
+
 with app.app_context():
 	connect_db()
 	insert_user('malte1@malte2', 'Malte', 'Brolund', 'asdasd', 1, 'Kristinehamn', 'Sweden', 'asdasdasd')
