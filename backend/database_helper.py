@@ -1,16 +1,18 @@
-from flask import Flask, current_app
+from flask import Flask
 import sqlite3
 from flask import g
 
-app = Flask(__name__)
-
 DATABASE = './database.db'
 #/home/malbr878/TDDD97/backend/database.db
+
+
 
 #connect to database
 def connect_db():
 	print("Connected")
 	g.db = sqlite3.connect(DATABASE)
+
+
 
 
 #closes database
@@ -19,6 +21,8 @@ def close_connection_db():
 	if db is not None:
 		db.close()
 
+
+
 def query_db(query, args=(), one=False):
 	cursor = connect_db().execute(query, args)
 	result = cursor.fetcall()
@@ -26,17 +30,21 @@ def query_db(query, args=(), one=False):
 	return (result[0] if result else None) if one else result
 
 
+
+
 #insert a user into the database
-def insert_user(email, firstname, familyname, password, sex, city, country, token):
+def insert_user(email, firstname, familyname, password, sex, city, country):
 	#do we need this? result = []
 
 	try:
-		cursor = g.db.execute("INSERT INTO users VALUES(?,?,?,?,?,?,?,?)" , [email, firstname, familyname, password, sex, city, country, token])
+		cursor = g.db.execute("INSERT INTO users VALUES(?,?,?,?,?,?,?,?)" , [email, firstname, familyname, password, sex, city, country, ""])
 		g.db.commit()
 
 		return True
 	except:
 		return False
+
+
 
 #find a user from the database
 def find_user(email):
@@ -53,12 +61,16 @@ def find_user(email):
 	return result
 
 
+
+
 def remove_user(email):
 	connect = connect_db()
 
 	cursor = g.db.execute("DELETE FROM users WHERE email =?", [email])
 	g.db.commit()
 	return cursor.lastrowid
+
+
 
 def create_post(sender, message, receiver):
 	#do we need this? result = []
@@ -69,13 +81,30 @@ def create_post(sender, message, receiver):
 	except:
 		return False
 
+
+
 def check_password(email, password):
 	cursor = g.db.execute("SELECT password FROM users WHERE email = ?", [email])
 	passwrd = cursor.fetchall()
 	cursor.close()
 	return passwrd
 
-with app.app_context():
-	connect_db()
-	insert_user('malte1@malte2', 'Malte', 'Brolund', 'asdasd', 1, 'Kristinehamn', 'Sweden', 'asdasdasd')
-	close_connection_db
+
+
+def insert_token(token, email):
+	try:
+		cursor = g.db.execute("INSERT INTO tokenlist VALUES(?,?)" , [token, email])
+		g.db.commit()
+		return True
+	except:
+		return False
+
+def find_inlogged(token):
+	cursor = g.db.execute("SELECT email FROM tokenlist WHERE token = ?", [token])
+	email = cursor.fetchall()
+	cursor.close()
+	return email
+
+def remove_token(token):
+	cursor = g.db.execute("DELETE FROM tokenlist WHERE token = ?", [token])
+	g.db.commit()

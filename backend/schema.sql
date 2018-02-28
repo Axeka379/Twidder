@@ -1,5 +1,7 @@
 DROP TABLE IF EXISTS users;
 DROP TABLE IF EXISTS messages;
+DROP TABLE IF EXISTS tokenlist;
+
 CREATE TABLE users (
 	email text NOT NULL PRIMARY KEY,
 	firstname text NOT NULL,
@@ -8,7 +10,6 @@ CREATE TABLE users (
 	sex INTEGER NOT NULL,	
 	city text NOT NULL,
 	country text NOT NULL,
-	token text
 );
 
 CREATE TABLE messages (
@@ -17,5 +18,11 @@ CREATE TABLE messages (
 	receiver text NOT NULL,
 	FOREIGN KEY (sender) REFERENCES users(email),
 	FOREIGN KEY (receiver) REFERENCES users(email)
+);
+
+CREATE TABLE tokenlist (
+	token text not null PRIMARY KEY,
+	email text not null,
+	FOREIGN KEY (sender) REFERENCES users(email)
 );
 
