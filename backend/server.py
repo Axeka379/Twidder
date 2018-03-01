@@ -1,6 +1,7 @@
 from flask import Flask, app, request
 from random import randint
 import database_helper
+import uuid
 import json
 
 
@@ -21,15 +22,10 @@ def sign_in():
 	email = request.args.get('email')
 	password = request.args.get('password')
 
-	if find_user(email) is not None && find_user(email)['password'] == password:
-
-		letters = "abcdefghiklmnopqrstuvwwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
-        token = "";
-        for i in range(0, 35):
-          token += letters[randint(0, 35)]
-		  insert_token(token, email)
-
-		return json.dumps({"Success": True, "message": "Successfully signed in", "data": token})
+	if find_user(email) is not None and find_user(email)['password'] == password:
+		token = str(uuid.uuid4())
+		insert_token(token, email)
+		return json.dumps({"Success": True, "message": "Successfully signed in", "data":token})
 
 	else:
 		return json.dumps({"Success": False, "message": "Wrong username or password"})
@@ -42,21 +38,21 @@ def sign_up():
 	if find_user(request.args.get('email')) is not None:
 
 		user = {
-			'email' : request.args.get('email')
-			'password' : request.args.get('password')
-			'firstname' : request.args.get('firstname')
-			'familyname' : request.args.get('familyname')
-			'sex' : request.args.get('sex')
-			'city' : request.args.get('city')
+			'email' : request.args.get('email'),
+			'password' : request.args.get('password'),
+			'firstname' : request.args.get('firstname'),
+			'familyname' : request.args.get('familyname'),
+			'sex' : request.args.get('sex'),
+			'city' : request.args.get('city'),
 			'country' : request.args.get('country')
 		}
 
-		if (insert_user(user['email'], user['firstname'], user['familyname'], user['sex'], user['city'] user['country'])):
+		if (insert_user(user['email'], user['firstname'], user['familyname'], user['sex'], user['city'], user['country'])):
 			return json.dumps({"Success" : True, "Message": "Successfully signed up"})
 		else:
 			return json.dumps({"Success" : False, "Message": "Something went wrong"})
-		else:
-			return json.dumps({"Success" : False, "Message": "User already exists"})
+	else:
+		return json.dumps({"Success" : False, "Message": "User already exists"})
 
 @app.route('/signout')
 def sign_out():
@@ -72,7 +68,16 @@ def sign_out():
 
 @app.route('/changepass')
 def Change_password(token, oldPassword, newPassword):
-	
+	if find_inlogged(token) is not None:
+		email = find_inlogged(token)
+		if oldPassword == find_user(email):
+			update_password(email, newPassword)
+			return json.dumps({"success": True, "message": "Password changed."})
+		else:
+			return json.dumps({"success": False, "message": "Wrong password."})
+	else:
+		return Json.dumps({"success": false, "message": "You are not logged in."})
+
 
 @app.route('/databytoken')
 def get_user_data_by_token():
@@ -88,7 +93,8 @@ def get_user_data_by_email():
 
 def data_by_email(token, email):
 	if find_inlogged(token) is not None:
-		if user = find_user(email) is not None:
+		if find_user(email) is not None:
+			user = find_user(email)
 			#does this work?
 			user['password'] = None
 			return json.dumps({"success": True, "message": "User data retrieved.", "data": user})
@@ -128,10 +134,12 @@ def post_message():
 	token = request.args.get('token')
 	message = request.args.get('message')
 	receiver = request.args.get('receiver')
-	if sender = find_inlogged(token) is not None:
+	if find_inlogged(token) is not None:
+		sender = find_inlogged(token)
 		if receiver is None:
 			receiver = sender
-		if recipient = find_user(receiver) is not None:
+		if find_user(receiver) is not None:
+			recipient = find_user(receiver)
 			create_post(sender, message, recipient)
 			return json.dumps({"success": True, "message": "Message posted"})
 		else:
