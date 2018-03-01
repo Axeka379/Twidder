@@ -1,6 +1,7 @@
 from flask import Flask
 import sqlite3
 from flask import g
+import json
 
 DATABASE = './database.db'
 #/home/malbr878/TDDD97/backend/database.db
@@ -37,7 +38,7 @@ def insert_user(email, firstname, familyname, password, sex, city, country):
 	#do we need this? result = []
 
 	try:
-		cursor = g.db.execute("INSERT INTO users VALUES(?,?,?,?,?,?,?,?)" , [email, firstname, familyname, password, sex, city, country, ""])
+		cursor = g.db.execute("INSERT INTO users VALUES(?,?,?,?,?,?,?)" , [email, firstname, familyname, password, sex, city, country])
 		g.db.commit()
 
 		return True

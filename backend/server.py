@@ -14,17 +14,18 @@ def before_request():
 
 @app.teardown_request
 def teardown_request(exception):
-	database_helper.close_db()
+	database_helper.close_connection_db()
 
 
 @app.route('/login')
 def sign_in():
-	email = request.args.get('email')
-	password = request.args.get('password')
+	data = request.json
+	email = data["email"]
+	password = data["password"]
 
-	if find_user(email) is not None and find_user(email)['password'] == password:
+	if database_helper.find_user(email) is not None and database_helper.find_user(email)['password'] == password:
 		token = str(uuid.uuid4())
-		insert_token(token, email)
+		database_helper.insert_token(token, email)
 		return json.dumps({"Success": True, "message": "Successfully signed in", "data":token})
 
 	else:
@@ -32,22 +33,13 @@ def sign_in():
 
 
 
-@app.route('/signup')
+@app.route('/signup', methods=['POST'])
 def sign_up():
 
-	if find_user(request.args.get('email')) is not None:
+	if database_helper.find_user(request.args.get('email')) is not None:
+		user = request.json
 
-		user = {
-			'email' : request.args.get('email'),
-			'password' : request.args.get('password'),
-			'firstname' : request.args.get('firstname'),
-			'familyname' : request.args.get('familyname'),
-			'sex' : request.args.get('sex'),
-			'city' : request.args.get('city'),
-			'country' : request.args.get('country')
-		}
-
-		if (insert_user(user['email'], user['firstname'], user['familyname'], user['sex'], user['city'], user['country'])):
+		if database_helper.insert_user(user["email"], user["firstname"], user["familyname"],user["password"],user["sex"],user["city"], user["country"]):
 			return json.dumps({"Success" : True, "Message": "Successfully signed up"})
 		else:
 			return json.dumps({"Success" : False, "Message": "Something went wrong"})
@@ -56,9 +48,9 @@ def sign_up():
 
 @app.route('/signout')
 def sign_out():
-	token = request.args.get('token')
-	if find_inlogged(token) is not None:
-		remove_token(token)
+	token = request.json["token"]
+	if database_helper.find_inlogged(token) is not None:
+		database_helper.remove_token(token)
 		#not sure if it's correct to do json.dumps
 		return json.dumps({"success": True, "message": "Successfully signed out."})
 	else:
@@ -67,34 +59,39 @@ def sign_out():
 
 
 @app.route('/changepass')
-def Change_password(token, oldPassword, newPassword):
-	if find_inlogged(token) is not None:
-		email = find_inlogged(token)
-		if oldPassword == find_user(email):
-			update_password(email, newPassword)
+def Change_password():
+	data = request.json
+	token = data["token"]
+	oldPassword = data["oldPassword"]
+	newPassword = data["newPassword"]
+	if database_helper.find_inlogged(token) is not None:
+		email = database_helper.find_inlogged(token)
+		if oldPassword == database_helper.find_user(email):
+			database_helper.update_password(email, newPassword)
 			return json.dumps({"success": True, "message": "Password changed."})
 		else:
 			return json.dumps({"success": False, "message": "Wrong password."})
 	else:
-		return Json.dumps({"success": false, "message": "You are not logged in."})
+		return Json.dumps({"success": False, "message": "You are not logged in."})
 
 
 @app.route('/databytoken')
 def get_user_data_by_token():
-	token = request.args.get('token')
-	email = find_inlogged(token)
+	token = request.json["token"]
+	email = database_helper.find_inlogged(token)
 	return data_by_email(token, email)
 
 @app.route('/databyemail')
 def get_user_data_by_email():
-	token = request.args.get('token')
-	email = request.args.get('email')
+	data = request.json
+	token = data["token"]
+	email = data["email"]
 	return data_by_email(token, email)
 
 def data_by_email(token, email):
-	if find_inlogged(token) is not None:
-		if find_user(email) is not None:
-			user = find_user(email)
+	if database_helper.database_helper.find_inlogged(token) is not None:
+		if database_helper.find_user(email) is not None:
+			user = database_helper.find_user(email)
 			#does this work?
 			user['password'] = None
 			return json.dumps({"success": True, "message": "User data retrieved.", "data": user})
@@ -105,20 +102,21 @@ def data_by_email(token, email):
 
 @app.route('/messagebytoken')
 def get_user_messages_by_token():
-	token = request.args.get('token')
+	token = request.json["token"]
 	email = find_inlogged(token)
 	message_by_email(token, email)
 
 @app.route('/messagebyemail')
 def get_user_messages_by_email():
-	token = request.args.get('token')
-	email = request.args.get('email')
+	data = request.json
+	token = data["token"]
+	email = data["email"]
 	message_by_email(token, email)
 
 def message_by_email(token, email):
-	if find_inlogged(token) is not None:
-		if find_user(email) is not None:
-			messages = get_messages(email)
+	if database_helper.find_inlogged(token) is not None:
+		if database_helper.find_user(email) is not None:
+			messages = database_helper.get_messages(email)
 			return json.dumps({"success": True, "message": "User messages retrieved", "data": messages})
 		else:
 			return json.dumps({"success": False, "message": "No such user"})
@@ -131,16 +129,17 @@ def message_by_email(token, email):
 
 @app.route('/postmessage')
 def post_message():
-	token = request.args.get('token')
-	message = request.args.get('message')
-	receiver = request.args.get('receiver')
-	if find_inlogged(token) is not None:
-		sender = find_inlogged(token)
+	data = request.json
+	token = data["token"]
+	message = data["messages"]
+	receiver = data["receiver"]
+	if database_helper.find_inlogged(token) is not None:
+		sender = database_helper.find_inlogged(token)
 		if receiver is None:
 			receiver = sender
-		if find_user(receiver) is not None:
-			recipient = find_user(receiver)
-			create_post(sender, message, recipient)
+		if database_helper.find_user(receiver) is not None:
+			recipient = database_helper.find_user(receiver)
+			database_helper.create_post(sender, message, recipient)
 			return json.dumps({"success": True, "message": "Message posted"})
 		else:
 			return json.dumps({"success": False, "message": "No such user."})

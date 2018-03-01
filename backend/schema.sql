@@ -7,9 +7,9 @@ CREATE TABLE users (
 	firstname text NOT NULL,
 	familyname text NOT NULL,
 	password text NOT NULL,
-	sex INTEGER NOT NULL,	
+	sex INTEGER NOT NULL,
 	city text NOT NULL,
-	country text NOT NULL,
+	country text NOT NULL
 );
 
 CREATE TABLE messages (
@@ -21,8 +21,7 @@ CREATE TABLE messages (
 );
 
 CREATE TABLE tokenlist (
-	token text not null PRIMARY KEY,
-	email text not null,
-	FOREIGN KEY (sender) REFERENCES users(email)
+	token text NOT NULL PRIMARY KEY,
+	email text NOT NULL,
+	FOREIGN KEY (email) REFERENCES users(email)
 );
-
