@@ -83,11 +83,13 @@ def create_post(sender, message, receiver):
 
 
 
-def check_password(email, password):
-	cursor = g.db.execute("SELECT password FROM users WHERE email = ?", [email])
-	passwrd = cursor.fetchall()
-	cursor.close()
-	return passwrd
+def update_password(email, password):
+try:
+	cursor = g.db.execute("UPDATE users SET password = ? WHERE email=? ", [password, email])
+	g.db.commit()
+	return True
+except:
+	return False
 
 
 
@@ -108,3 +110,8 @@ def find_inlogged(token):
 def remove_token(token):
 	cursor = g.db.execute("DELETE FROM tokenlist WHERE token = ?", [token])
 	g.db.commit()
+
+def get_messages(email)
+	cursor = g.db.execute("SELECT * from messages where receiver="email")
+	messages = cursor.fetchall();
+	cursor.close()

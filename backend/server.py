@@ -72,6 +72,7 @@ def sign_out():
 
 @app.route('/changepass')
 def Change_password(token, oldPassword, newPassword):
+	
 
 @app.route('/databytoken')
 def get_user_data_by_token():
@@ -99,13 +100,26 @@ def data_by_email(token, email):
 @app.route('/messagebytoken')
 def get_user_messages_by_token():
 	token = request.args.get('token')
+	email = find_inlogged(token)
+	message_by_email(token, email)
 
 @app.route('/messagebyemail')
 def get_user_messages_by_email():
 	token = request.args.get('token')
 	email = request.args.get('email')
+	message_by_email(token, email)
 
 def message_by_email(token, email):
+	if find_inlogged(token) is not None:
+		if find_user(email) is not None:
+			messages = get_messages(email)
+			return json.dumps({"success": True, "message": "User messages retrieved", "data": messages})
+		else:
+			return json.dumps({"success": False, "message": "No such user"})
+	else:
+		return json.dumps({"success": False, "message": "You are not signed in"})
+
+
 	#we are here!
 	#need to make a function in database_helper to get all messages for user
 
