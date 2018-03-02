@@ -17,13 +17,16 @@ def teardown_request(exception):
 	database_helper.close_connection_db()
 
 
-@app.route('/login')
+@app.route('/login', methods=['POST'])
 def sign_in():
 	data = request.json
 	email = data["email"]
 	password = data["password"]
 
-	if database_helper.find_user(email) is not None and database_helper.find_user(email)['password'] == password:
+	print(database_helper.find_user(email)[0]["password"])
+	print(password)
+
+	if database_helper.find_user(email) is not None and database_helper.find_user(email)[0]["password"] == password:
 		token = str(uuid.uuid4())
 		database_helper.insert_token(token, email)
 		return json.dumps({"Success": True, "message": "Successfully signed in", "data":token})
@@ -39,6 +42,8 @@ def sign_up():
 	if database_helper.find_user(request.args.get('email')) is not None:
 		user = request.json
 
+		print(user["email"])
+
 		if database_helper.insert_user(user["email"], user["firstname"], user["familyname"],user["password"],user["sex"],user["city"], user["country"]):
 			return json.dumps({"Success" : True, "Message": "Successfully signed up"})
 		else:
@@ -46,7 +51,7 @@ def sign_up():
 	else:
 		return json.dumps({"Success" : False, "Message": "User already exists"})
 
-@app.route('/signout')
+@app.route('/signout', methods=['POST'])
 def sign_out():
 	token = request.json["token"]
 	if database_helper.find_inlogged(token) is not None:
@@ -58,15 +63,18 @@ def sign_out():
 
 
 
-@app.route('/changepass')
+@app.route('/changepass', methods=['POST'])
 def Change_password():
 	data = request.json
 	token = data["token"]
 	oldPassword = data["oldPassword"]
 	newPassword = data["newPassword"]
 	if database_helper.find_inlogged(token) is not None:
-		email = database_helper.find_inlogged(token)
-		if oldPassword == database_helper.find_user(email):
+		email = database_helper.find_inlogged(token))
+		print (email[0])
+		print (str(database_helper.check_password(email)))
+		print (oldPassword)
+		if oldPassword == database_helper.find_user(email)[0]["password"]:
 			database_helper.update_password(email, newPassword)
 			return json.dumps({"success": True, "message": "Password changed."})
 		else:

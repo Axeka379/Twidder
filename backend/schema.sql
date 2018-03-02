@@ -7,7 +7,7 @@ CREATE TABLE users (
 	firstname text NOT NULL,
 	familyname text NOT NULL,
 	password text NOT NULL,
-	sex INTEGER NOT NULL,
+	sex text NOT NULL,
 	city text NOT NULL,
 	country text NOT NULL
 );

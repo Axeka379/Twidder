@@ -38,11 +38,12 @@ def insert_user(email, firstname, familyname, password, sex, city, country):
 	#do we need this? result = []
 
 	try:
-		cursor = g.db.execute("INSERT INTO users VALUES(?,?,?,?,?,?,?)" , [email, firstname, familyname, password, sex, city, country])
+		cursor = g.db.execute("INSERT INTO users VALUES(?,?,?,?,?,?,?)",[email, firstname, familyname, password, sex, city, country])
 		g.db.commit()
 
 		return True
-	except:
+	except sqlite3.OperationalError, msg:
+		print(msg)
 		return False
 
 
@@ -50,23 +51,23 @@ def insert_user(email, firstname, familyname, password, sex, city, country):
 #find a user from the database
 def find_user(email):
 	result = []
-	cursor = g.db.execute("select * from users where email = ?", [email])
+	cursor = g.db.execute("SELECT * FROM users WHERE email = ?", [email])
 	#commit
 	rows = cursor.fetchall()
 	cursor.close()
 
 	for index in range(len(rows)):
-		result.append({'email':rows[index][0], 'firstname':rows[index][0],
-			'familyname':rows[index][0], 'password':rows[index][0],
-			'sex':rows[index][0], 'city':rows[index][0],
-			'country':rows[index][0], 'token':rows[index][0]})
+		result.append({'email':rows[index][0], 'firstname':rows[index][1],
+			'familyname':rows[index][2], 'password':rows[index][3],
+			'sex':rows[index][4], 'city':rows[index][5],
+			'country':rows[index][6]})
 	return result
 
 
 
 
 def remove_user(email):
-	connect = connect_db()
+	#connect = connect_db()
 
 	cursor = g.db.execute("DELETE FROM users WHERE email =?", [email])
 	g.db.commit()
@@ -85,7 +86,7 @@ def create_post(sender, message, receiver):
 
 
 
-def check_password(email, password):
+def check_password(email):
 	cursor = g.db.execute("SELECT password FROM users WHERE email = ?", [email])
 	passwrd = cursor.fetchall()
 	cursor.close()
@@ -111,9 +112,9 @@ def insert_token(token, email):
 
 def find_inlogged(token):
 	cursor = g.db.execute("SELECT email FROM tokenlist WHERE token = ?", [token])
-	email = cursor.fetchall()
+	result = cursor.fetchall()
 	cursor.close()
-	return email
+	return result
 
 def remove_token(token):
 	cursor = g.db.execute("DELETE FROM tokenlist WHERE token = ?", [token])
