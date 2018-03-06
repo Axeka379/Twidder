@@ -55,13 +55,12 @@ def find_user(email):
 	#commit
 	rows = cursor.fetchall()
 	cursor.close()
-
 	for index in range(len(rows)):
 		result.append({'email':rows[index][0], 'firstname':rows[index][1],
 			'familyname':rows[index][2], 'password':rows[index][3],
 			'sex':rows[index][4], 'city':rows[index][5],
 			'country':rows[index][6]})
-	return result
+	return (result[0] if result else None)
 
 
 
@@ -90,7 +89,7 @@ def check_password(email):
 	cursor = g.db.execute("SELECT password FROM users WHERE email = ?", [email])
 	passwrd = cursor.fetchall()
 	cursor.close()
-	return passwrd
+	return (passwrd[0] if passwrd else None)
 
 def update_password(email, password):
 	try:
@@ -114,8 +113,15 @@ def find_inlogged(token):
 	cursor = g.db.execute("SELECT email FROM tokenlist WHERE token = ?", [token])
 	result = cursor.fetchall()
 	cursor.close()
-	return result
+	return (result[0][0] if result else None)
 
 def remove_token(token):
 	cursor = g.db.execute("DELETE FROM tokenlist WHERE token = ?", [token])
 	g.db.commit()
+
+
+def get_messages(email):
+	cursor = g.db.execute("SELECT message FROM messages WHERE receiver = ?", [email])
+	result = cursor.fetchall()
+	cursor.close()
+	return (result if result else None)
