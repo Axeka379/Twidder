@@ -1,12 +1,17 @@
+
 from flask import Flask, app, request
 from random import randint
-import database_helper
+
+import database_helper as dh
+
 import uuid
 import json
 
 
 app = Flask(__name__)
 app.debug = True
+
+import runserver
 
 @app.route('/')
 @app.route('/client')
