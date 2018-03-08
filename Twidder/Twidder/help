@@ -1,0 +1,10 @@
+source virt/bin/activate
+
+
+300 rader
+
+
+request -- to get or send? flask
+
+
+sqlite3 database.db
