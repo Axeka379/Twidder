@@ -1,4 +1,3 @@
-
 displayView = function(){
 // the code required to display a view
 };
@@ -8,14 +7,21 @@ window.onload = function(){
   var homeview;
   if (localStorage.getItem("token")) {
     view = document.getElementById("loggedinview").innerHTML;
-    var info = serverstub.getUserDataByToken(localStorage.getItem("token"));
+    var info;
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+      if (this.readyState == 4 && this.status == 200) {
+        info =
+      }
+    }
+    //var info = serverstub.getUserDataByToken(localStorage.getItem("token"));
 
     homeview = profileInfo(info);
 
-      document.getElementById("content").innerHTML = view;
-      var oldview = document.getElementById("homeArea").innerHTML;
-      document.getElementById("homeArea").innerHTML = homeview + oldview;
-      functionReloadMessage();
+    document.getElementById("content").innerHTML = view;
+    var oldview = document.getElementById("homeArea").innerHTML;
+    document.getElementById("homeArea").innerHTML = homeview + oldview;
+    functionReloadMessage();
 
   }else {
     document.getElementById("content").innerHTML = document.getElementById("welcomeview").innerHTML;
@@ -231,7 +237,7 @@ sendMessageToEmail = function(){
   console.log(text);
   var email = localStorage.getItem("browse");
   console.log(email);
-  serverstub.postMessage(localStorage.getItem("token"), text, email)
+  serverstub.postMessage(localStorage.getItem("token"), text, email);
   document.getElementById("submittext").value = "";
   insertText(serverstub.getUserDataByToken(localStorage.getItem("token"))["data"].email, text, "thewallOther");
 }

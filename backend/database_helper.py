@@ -125,3 +125,8 @@ def get_messages(email):
 	result = cursor.fetchall()
 	cursor.close()
 	return (result if result else None)
+
+
+def delete_logged_in_by_email(email):
+	cursor = g.db.execute("DELETE FROM tokenlist WHERE email = ?", [email])
+	g.db.commit()

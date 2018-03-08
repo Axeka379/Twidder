@@ -24,6 +24,8 @@ def sign_in():
 	password = data["password"]
 	print(password)
 
+	database_helper.delete_logged_in_by_email(email)
+
 	if database_helper.find_user(email) is not None and database_helper.find_user(email)["password"] == password:
 		token = str(uuid.uuid4())
 		database_helper.insert_token(token, email)
@@ -97,7 +99,7 @@ def data_by_email(token, email):
 	if database_helper.find_inlogged(token) is not None:
 		if database_helper.find_user(email) is not None:
 			user = database_helper.find_user(email)
-			
+
 			del user['password']
 			return json.dumps({"success": True, "message": "User data retrieved.", "data": user})
 		else:
