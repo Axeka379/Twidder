@@ -1,6 +1,7 @@
 
 from flask import Flask, app, request
 from random import randint
+from geventwebsocket import WebSocketError
 
 import database_helper as dh
 
@@ -12,6 +13,9 @@ app = Flask(__name__)
 app.debug = True
 
 import Twidder
+
+sockets = {}
+
 
 @app.route('/')
 @app.route('/client')
@@ -33,8 +37,6 @@ def sign_in():
     data = request.json
     email = data["email"]
     password = data["password"]
-    print(password)
-    print(email)
 
     #database_helper.delete_logged_in_by_email(email)
 
@@ -71,7 +73,7 @@ def sign_out():
 	token = request.json["token"]
 	if database_helper.find_inlogged(token) is not None:
 		database_helper.remove_token(token)
-		#not sure if it's correct to do json.dumps
+
 		return json.dumps({"Success": True, "message": "Successfully signed out."})
 	else:
 		return json.dumps({"Success": False, "message": "You are not signed in."})
@@ -178,10 +180,53 @@ def post_message():
 
 
 
+@app.route('/socket')
+def api():
+    websocket = request.environ['wsgi.websocket']
+    if websocket is None:
+        print("there is no socket")
+        return json.dumps({"success": False, "messages":"Didn't get a socket"})
 
-@app.route("/")
-def hello():
-	return "Hello World!"
+    token = ""
+    email = ""
+    otherToken = ""
+    try:
 
-if __name__ == "__main__":
-	app.run()
+        data = json.loads(websocket.receive())
+        token = data["token"]
+        email = database_helper.find_inlogged(token)
+
+        if email is not None:
+            if token not in sockets:
+                sockets[token] = websocket
+            for tok in database_helper.find_token(email):
+                otherToken = tok[0]
+                print(otherToken)
+                if otherToken != token and otherToken is not None:
+                    sockets[otherToken].send(json.dumps({"success": True}))
+                    sockets[otherToken].close()
+                    del sockets[otherToken]
+
+            while True:
+                data = websocket.receive()
+                if data is None:
+                    #del sockets[token]
+                    websocket.close();
+                    return json.dumps({"success": False, "messages":"connection closed"})
+
+    except WebSocketError as e:
+        print("error")
+        del sockets[otherToken]
+        json.dumps({"success": False, "messages":"something went wrong"})
+
+
+
+
+
+
+#@app.route("/")
+#def hello():
+#	return "Hello World!"
+
+#if __name__ == "__main__":
+#	app.run()

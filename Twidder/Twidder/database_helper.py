@@ -116,6 +116,12 @@ def find_inlogged(token):
 	cursor.close()
 	return (result[0][0] if result else None)
 
+def find_token(email):
+	cursor = g.db.execute("SELECT token FROM tokenlist WHERE email = ?", [email])
+	result = cursor.fetchall()
+	cursor.close()
+	return (result if result else None)
+
 def remove_token(token):
 	cursor = g.db.execute("DELETE FROM tokenlist WHERE token = ?", [token])
 	g.db.commit()
@@ -128,6 +134,6 @@ def get_messages(email):
 	return (result if result else None)
 
 
-def delete_logged_in_by_email(email):
-	cursor = g.db.execute("DELETE FROM tokenlist WHERE email = ?", [email])
-	g.db.commit()
+#def delete_logged_in_by_email(email):
+#	cursor = g.db.execute("DELETE FROM tokenlist WHERE email = ?", [email])
+#	g.db.commit()

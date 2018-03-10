@@ -2,11 +2,17 @@
 displayView = function(){
 // the code required to display a view
 };
+
+window.onbeforeunload = function(){
+  functionlogout();
+}
+
 window.onload = function(){
 
   var view;
   var homeview;
-  if (localStorage.getItem("token")) {
+  token = localStorage.getItem("token")
+  if (token) {
     view = document.getElementById("loggedinview").innerHTML;
 
     var info;
@@ -15,7 +21,7 @@ window.onload = function(){
       if (this.readyState == 4 && this.status == 200) {
         info = JSON.parse(xhttp.responseText);
         homeview = profileInfo(info);
-
+        conSocket(token);
         document.getElementById("content").innerHTML = view;
         var oldview = document.getElementById("homeArea").innerHTML;
         document.getElementById("homeArea").innerHTML = homeview + oldview;
@@ -66,7 +72,7 @@ profileInfo = function(info){
       "<th>Last name: </th> <td> " + info["data"].familyname +" </td> " +
     "</tr>" +
     "<tr>" +
-      "<th>Gender: </th> <td> " + info["data"].gender +" </td> " +
+      "<th>Gender: </th> <td> " + info["data"].sex +" </td> " +
     "</tr>" +
     "<tr>" +
       "<th>City: </th> <td> " + info["data"].city +" </td> " +
@@ -87,6 +93,9 @@ functionsignup = function(){
   console.log(pass1);
   console.log(pass2);
   if (pass1 === pass2) {
+    //localhost?
+    socket.send(1);
+
     var login_object = {
       "email":document.forms["signupform"]["emailsignup"].value,
       "password":document.forms["signupform"]["passwordsignup"].value,
@@ -215,7 +224,22 @@ functionchangepsw = function(){
 
 
 functionlogout = function(){
-  localStorage.removeItem("token");
+  var send_object = {
+    "token":localStorage.getItem("token")
+  };
+  var message;
+  var xhttp = new XMLHttpRequest();
+  xhttp.onreadystatechange = function() {
+    if (this.readyState == 4 && this.status == 200) {
+      message = JSON.parse(xhttp.responseText);
+
+    }
+    localStorage.removeItem("token");
+  };
+  xhttp.open("POST", "/signout", true);
+  xhttp.setRequestHeader("Content-Type", "application/json");
+  xhttp.send(JSON.stringify(send_object));
+
   view = document.getElementById("welcomeview").innerHTML;
   document.getElementById("content").innerHTML = view;
 }
@@ -418,12 +442,38 @@ sendMessageToEmail = function(){
   //insertText(serverstub.getUserDataByToken(localStorage.getItem("token"))["data"].email, text, "thewallOther");
 }
 
-POSTrequest = function(xhttp, address, data){
-	xhttp.open("POST", address, true);
-	xhttp.send(data);
-}
 
-GETrequest = function(xhttp, address){
-	xhttp.open("GET", address, true);
-	xhttp.send();
+
+conSocket = function(token){
+  var socket = new WebSocket("ws://" + document.domain + ":5000/socket");
+  var data = {
+    "token":token
+  };
+
+
+  socket.onopen = function(){
+    socket.send(JSON.stringify(data));
+  }
+
+
+  socket.onmessage = function(msg){
+    data = JSON.parse(msg.data);
+    if(data["success"] == true){
+      functionlogout();
+    }
+  }
+
+  socket.onclose = function(){
+    console.log("closed socket connection");
+    socket.close();
+    functionlogout();
+  }
+
+  socket.onerror = function(){
+    socket.close();
+    console.log("error with socket");
+
+  }
+
+
 }
