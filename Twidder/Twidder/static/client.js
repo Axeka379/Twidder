@@ -4,7 +4,7 @@ displayView = function(){
 };
 
 window.onbeforeunload = function(){
-  functionlogout();
+  //functionlogout();
 }
 
 window.onload = function(){
@@ -21,10 +21,14 @@ window.onload = function(){
       if (this.readyState == 4 && this.status == 200) {
         info = JSON.parse(xhttp.responseText);
         homeview = profileInfo(info);
-        conSocket(token);
         document.getElementById("content").innerHTML = view;
         var oldview = document.getElementById("homeArea").innerHTML;
         document.getElementById("homeArea").innerHTML = homeview + oldview;
+        chartUsers = initChart();
+        conSocket(token);
+
+
+
 
       }
     };
@@ -94,7 +98,7 @@ functionsignup = function(){
   console.log(pass2);
   if (pass1 === pass2) {
     //localhost?
-    socket.send(1);
+    //socket.send(1);
 
     var login_object = {
       "email":document.forms["signupform"]["emailsignup"].value,
@@ -111,7 +115,10 @@ functionsignup = function(){
     xhttp.onreadystatechange = function() {
       if (this.readyState == 4 && this.status == 200) {
         message = JSON.parse(xhttp.responseText);
-
+        console.log(message["Success"]);
+        if(message["Success"]){
+          conSocketReg();
+        }
       }
     };
     xhttp.open("POST", "/signup", true);
@@ -224,6 +231,8 @@ functionchangepsw = function(){
 
 
 functionlogout = function(){
+  socket.close();
+
   var send_object = {
     "token":localStorage.getItem("token")
   };
@@ -243,6 +252,8 @@ functionlogout = function(){
   view = document.getElementById("welcomeview").innerHTML;
   document.getElementById("content").innerHTML = view;
 }
+
+
 
 functionuploadmes = function(){
   var text = document.getElementById("submittext").value;
@@ -277,15 +288,15 @@ functionReloadMessage = function()
 {
 
   //console.log("Testing functionReloadMessage")
-
+  var chatArea = document.getElementById("thewall");
+  chatArea.innerHTML = " ";
   var data;
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
     if (this.readyState == 4 && this.status == 200) {
       data = JSON.parse(xhttp.responseText);
       var messages = data["data"];
-      var chatArea = document.getElementById("thewall");
-      chatArea.innerHTML = "";
+
       console.log(messages);
       insertText(messages, "thewall");
     }
@@ -442,10 +453,11 @@ sendMessageToEmail = function(){
   //insertText(serverstub.getUserDataByToken(localStorage.getItem("token"))["data"].email, text, "thewallOther");
 }
 
-
+var socket;
+var chartUsers;
 
 conSocket = function(token){
-  var socket = new WebSocket("ws://" + document.domain + ":5000/socket");
+  socket = new WebSocket("ws://" + document.domain + ":5000/socket");
   var data = {
     "token":token
   };
@@ -458,14 +470,15 @@ conSocket = function(token){
 
   socket.onmessage = function(msg){
     data = JSON.parse(msg.data);
-    if(data["success"] == true){
+    if(data["success"] == true && data["updateloggedin"] == false){
       functionlogout();
+    }else{
+      updateChart(data["online"], data["offline"]);
     }
   }
 
   socket.onclose = function(){
     console.log("closed socket connection");
-    socket.close();
     functionlogout();
   }
 
@@ -475,5 +488,81 @@ conSocket = function(token){
 
   }
 
+
+}
+
+
+conSocketReg = function(){
+  socket = new WebSocket("ws://" + document.domain + ":5000/regsocket");
+  var data = {
+    "success": true
+  };
+
+  socket.onopen = function(){
+    console.log("sending");
+    socket.send(JSON.stringify(data));
+  }
+
+
+  socket.onmessage = function(msg){
+    data = JSON.parse(msg.data);
+  }
+
+  socket.onclose = function(){
+    socket.close();
+    console.log("closed socket connection");
+  }
+
+  socket.onerror = function(){
+    socket.close();
+    console.log("error with socket");
+
+  }
+
+
+}
+
+
+
+
+
+
+
+initChart = function(online, offline){
+  return new Chart(document.getElementById("doughnut-chart"), {
+      type: 'doughnut',
+      data: {
+        labels: ["online", "offline"],
+        datasets: [
+          {
+            label: "users",
+            backgroundColor: ["blue", "red"],
+            data: [online, offline]
+          }
+        ]
+      },
+      options: {
+        title: {
+          display: true,
+          text: 'number of people online/offline'
+        }
+      }
+  });
+}
+
+updateChart = function(online, offline){
+  console.log(offline);
+  if (offline == -1){
+    console.log("hejhejehejehads");
+    chartUsers.data.datasets[0].data[0] = online;
+    chartUsers.update();
+  }else if (online == -1){
+    chartUsers.data.datasets[0].data[1] = offline;
+    chartUsers.update();
+  }else{
+    chartUsers.data.datasets[0].data[0] = online;
+    chartUsers.data.datasets[0].data[1] = offline;
+    chartUsers.update();
+  }
 
 }

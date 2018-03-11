@@ -199,24 +199,78 @@ def api():
         if email is not None:
             if token not in sockets:
                 sockets[token] = websocket
+
+
+
             for tok in database_helper.find_token(email):
                 otherToken = tok[0]
                 print(otherToken)
                 if otherToken != token and otherToken is not None:
-                    sockets[otherToken].send(json.dumps({"success": True}))
+                    sockets[otherToken].send(json.dumps({"success": True, "updateloggedin":False}))
                     sockets[otherToken].close()
                     del sockets[otherToken]
 
+            for othersock in sockets.items():
+                if othersock[1] is not None:
+                    othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets))}))
+
+            websocket.send(json.dumps({"success": True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets))}));
+
+            #websocket.send(json.dumps({"success":True, "updateloggedin":True, "number":len(sockets)}))
+
             while True:
                 data = websocket.receive()
+                #websocket.send(json.dumps({"success":True, "updateloggedin":True, "number":len(sockets)}))
                 if data is None:
-                    #del sockets[token]
+                    del sockets[token]
+
+                    for othersock in sockets.items():
+                        if othersock[1] is not None:
+                            othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets))}))
+
                     websocket.close();
                     return json.dumps({"success": False, "messages":"connection closed"})
+
 
     except WebSocketError as e:
         print("error")
         del sockets[otherToken]
+
+        for othersock in sockets.items():
+            if othersock[1] is not None:
+                othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets))}))
+
+        json.dumps({"success": False, "messages":"something went wrong"})
+
+
+
+
+
+
+
+
+
+
+@app.route('/regsocket')
+def regapi():
+    websocket = request.environ['wsgi.websocket']
+    if websocket is None:
+        print("there is no socket")
+        return json.dumps({"success": False, "messages":"Didn't get a socket"})
+
+    try:
+        print("sent");
+        data = json.loads(websocket.receive())
+        if(data["success"]):
+            for othersock in sockets.items():
+                if othersock[1] is not None:
+                    othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets))}))
+
+        websocket.close();
+
+
+    except WebSocketError as e:
+        print("error")
         json.dumps({"success": False, "messages":"something went wrong"})
 
 

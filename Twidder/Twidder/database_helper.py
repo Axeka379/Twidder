@@ -133,6 +133,12 @@ def get_messages(email):
 	cursor.close()
 	return (result if result else None)
 
+def amount_registered():
+	cursor = g.db.execute("SELECT * FROM users")
+	result = cursor.fetchall()
+	cursor.close()
+	return (len(result) if result else None)
+
 
 #def delete_logged_in_by_email(email):
 #	cursor = g.db.execute("DELETE FROM tokenlist WHERE email = ?", [email])

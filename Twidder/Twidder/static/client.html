@@ -2,6 +2,7 @@
 
 <head>
 <link href="static/client.css" type="text/css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.5.0/Chart.min.js"></script>
 <script src="static/client.js" type="text/javascript"></script>
 <script src="static/serverstub.js" type="text/javascript"></script>
 <script type="text/view" id="welcomeview">
@@ -40,7 +41,7 @@
 
 
         <div id="signup">
-            <form id="signupform" onsubmit="return functionsignup();">
+            <form id="signupform" onsubmit="functionsignup(); return false;">
                 <div class="inner">
                     <div class="row" id="headerdiv">
                         <label for="header" id="header"> Sign up here</label>
@@ -127,6 +128,10 @@
             <div id="wall">
               <textarea id="thewall" rows="38" cols="100"readonly> </textarea>
               <button onclick="functionReloadMessage(); return false;"> Reload</button>
+            </div>
+
+            <div id="chart">
+              <canvas id="doughnut-chart" width="2000" height="450"></canvas>
             </div>
 
           </div>
