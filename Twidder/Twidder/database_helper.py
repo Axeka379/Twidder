@@ -140,6 +140,12 @@ def amount_registered():
 	return (len(result) if result else None)
 
 
+def amount_of_different_genders():
+	cursor = g.db.execute("SELECT sex FROM users")
+	result = cursor.fetchall()
+	cursor.close()
+	return (result if result else None)
+
 #def delete_logged_in_by_email(email):
 #	cursor = g.db.execute("DELETE FROM tokenlist WHERE email = ?", [email])
 #	g.db.commit()

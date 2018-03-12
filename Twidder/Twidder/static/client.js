@@ -24,7 +24,8 @@ window.onload = function(){
         document.getElementById("content").innerHTML = view;
         var oldview = document.getElementById("homeArea").innerHTML;
         document.getElementById("homeArea").innerHTML = homeview + oldview;
-        chartUsers = initChart();
+        chartUsers = initChart(0, 0, "online", "offline", "doughnut-chart", "number of people online/offline");
+        chartUsersGender = initChart(0, 0, "male", "female", "doughnut-chart-gender", "Amount of male/female");
         conSocket(token);
 
 
@@ -455,6 +456,7 @@ sendMessageToEmail = function(){
 
 var socket;
 var chartUsers;
+var chartUsersGender
 
 conSocket = function(token){
   socket = new WebSocket("ws://" + document.domain + ":5000/socket");
@@ -473,7 +475,9 @@ conSocket = function(token){
     if(data["success"] == true && data["updateloggedin"] == false){
       functionlogout();
     }else{
-      updateChart(data["online"], data["offline"]);
+      updateChart(data["online"], data["offline"],chartUsers);
+      updateChart(data["male"], data["female"],chartUsersGender);
+
     }
   }
 
@@ -528,41 +532,40 @@ conSocketReg = function(){
 
 
 
-initChart = function(online, offline){
-  return new Chart(document.getElementById("doughnut-chart"), {
+initChart = function(data1, data2, label1, label2, id, headerText){
+  return new Chart(document.getElementById(id), {
       type: 'doughnut',
       data: {
-        labels: ["online", "offline"],
+        labels: [label1, label2],
         datasets: [
           {
             label: "users",
             backgroundColor: ["blue", "red"],
-            data: [online, offline]
+            data: [data1, data2]
           }
         ]
       },
       options: {
         title: {
           display: true,
-          text: 'number of people online/offline'
+          text: headerText
         }
       }
   });
 }
 
-updateChart = function(online, offline){
+updateChart = function(online, offline, chart){
   console.log(offline);
   if (offline == -1){
-    console.log("hejhejehejehads");
-    chartUsers.data.datasets[0].data[0] = online;
-    chartUsers.update();
+    chart.data.datasets[0].data[0] = online;
+    chart.update();
   }else if (online == -1){
-    chartUsers.data.datasets[0].data[1] = offline;
-    chartUsers.update();
+    chart.data.datasets[0].data[1] = offline;
+    chart.update();
   }else{
-    chartUsers.data.datasets[0].data[0] = online;
-    chartUsers.data.datasets[0].data[1] = offline;
-    chartUsers.update();
+    chart.data.datasets[0].data[0] = online;
+    chart.data.datasets[0].data[1] = offline;
+    chart.update();
   }
 
 }

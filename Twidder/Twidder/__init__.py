@@ -211,10 +211,11 @@ def api():
                     del sockets[otherToken]
 
             for othersock in sockets.items():
+                male, female = calculateGender()
                 if othersock[1] is not None:
-                    othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets))}))
+                    othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets)), "male":male,"female":female}))
 
-            websocket.send(json.dumps({"success": True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets))}));
+            websocket.send(json.dumps({"success": True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets)), "male":male,"female":female, "male":male,"female":female}));
 
             #websocket.send(json.dumps({"success":True, "updateloggedin":True, "number":len(sockets)}))
 
@@ -223,10 +224,10 @@ def api():
                 #websocket.send(json.dumps({"success":True, "updateloggedin":True, "number":len(sockets)}))
                 if data is None:
                     del sockets[token]
-
+                    male, female = calculateGender()
                     for othersock in sockets.items():
                         if othersock[1] is not None:
-                            othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets))}))
+                            othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets)), "male":male,"female":female}))
 
                     websocket.close();
                     return json.dumps({"success": False, "messages":"connection closed"})
@@ -235,10 +236,10 @@ def api():
     except WebSocketError as e:
         print("error")
         del sockets[otherToken]
-
+        male, female = calculateGender()
         for othersock in sockets.items():
             if othersock[1] is not None:
-                othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets))}))
+                othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets)), "male":male,"female":female}))
 
         json.dumps({"success": False, "messages":"something went wrong"})
 
@@ -262,9 +263,11 @@ def regapi():
         print("sent");
         data = json.loads(websocket.receive())
         if(data["success"]):
+            male, female = calculateGender()
+            print("hej", len(sockets.items()))
             for othersock in sockets.items():
                 if othersock[1] is not None:
-                    othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets))}))
+                    othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets)), "male":male,"female":female}))
 
         websocket.close();
 
@@ -275,7 +278,18 @@ def regapi():
 
 
 
+def calculateGender():
+    data = database_helper.amount_of_different_genders()
+    male = 0
+    female = 0
+    for x in data:
+        print(x[0])
+        if(x[0] == "male"):
+            male += 1
+        else:
+            female += 1
 
+    return male, female
 
 
 #@app.route("/")

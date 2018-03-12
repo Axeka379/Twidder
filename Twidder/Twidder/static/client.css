@@ -266,6 +266,23 @@ div#accountArea h1{
 	margin-right: 20px;
 }
 
+#doughnut-chart-gender{
+}
+#doughnut-chart{
+}
+
+#chart{
+	float:left;
+	width:200px;
+	height:200px;
+}
+
+#chart-gender{
+	float:right;
+	width:200px;
+	height:200px;
+}
+
 
 div#maincontainer button{
 		margin-right: 3px;
