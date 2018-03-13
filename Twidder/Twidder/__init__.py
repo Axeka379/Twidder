@@ -70,10 +70,8 @@ def reload():
                 sockets[email].close()
                 del sockets[email]
 
-        print("verrrrrry gooooood1")
         for othersock in sockets.items():
             male, female = calculateGender()
-            print("verrrrrry gooooood")
             if othersock[1] is not None:
                 othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets)+1, "offline":(database_helper.amount_registered() - len(sockets)-1), "male":male,"female":female}))
 
@@ -267,7 +265,6 @@ def api():
                 del sockets[email]
                 male, female = calculateGender()
                 for othersock in sockets.items():
-                    print("not good")
                     if othersock[1] is not None:
                         othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets)), "male":male,"female":female}))
 
@@ -280,7 +277,6 @@ def api():
         del sockets[email]
         male, female = calculateGender()
         for othersock in sockets.items():
-            print("not good2")
             if othersock[1] is not None:
                 othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets)), "male":male,"female":female}))
 
@@ -295,7 +291,7 @@ def api():
 
 
 
-@app.route('/regsocket')
+'''@app.route('/regsocket')
 def regapi():
     websocket = request.environ['wsgi.websocket']
     if websocket is None:
@@ -317,7 +313,7 @@ def regapi():
     except WebSocketError as e:
         print("error")
         json.dumps({"success": False, "messages":"something went wrong"})
-
+'''
 
 
 def calculateGender():
