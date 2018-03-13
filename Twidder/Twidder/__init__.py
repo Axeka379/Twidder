@@ -41,6 +41,25 @@ def sign_in():
     #database_helper.delete_logged_in_by_email(email)
 
     if database_helper.find_user(email) is not None and database_helper.find_user(email)["password"] == password:
+
+
+
+        #Socket. log out other people and update charts
+        if email is not None:
+            #if token not in sockets:
+            #    sockets[token] = websocket
+            #sockets[token] = websocket
+            if database_helper.find_token(email)is not None and len(database_helper.find_token(email)) != 0:
+                print(email)
+                sockets[email].send(json.dumps({"success": True, "updateloggedin":False}))
+                sockets[email].close()
+                del sockets[email]
+
+            for othersock in sockets.items():
+                male, female = calculateGender()
+                if othersock[1] is not None:
+                    othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets)+1, "offline":(database_helper.amount_registered() - (len(sockets)+1)), "male":male,"female":female}))
+
         print("after find user")
         token = str(uuid.uuid4())
         database_helper.insert_token(token, email)
@@ -54,19 +73,25 @@ def sign_in():
 
 @app.route('/signup', methods=['POST'])
 def sign_up():
-	user = request.json
-	if user['email'] == "" or user['password'] == "" or user["sex"] == "" or user["firstname"] == "" or user["familyname"] == "" or user["city"] == "" or user["country"] == "" or len(user["password"]) < 6:
-		return json.dumps({"Success" : False, "Message": "Bad input"})
-	if database_helper.find_user(user['email']) is None:
+    user = request.json
+    if user['email'] == "" or user['password'] == "" or user["sex"] == "" or user["firstname"] == "" or user["familyname"] == "" or user["city"] == "" or user["country"] == "" or len(user["password"]) < 6:
+    	return json.dumps({"Success" : False, "Message": "Bad input"})
+    if database_helper.find_user(user['email']) is None:
 
 
 
-		if database_helper.insert_user(user["email"], user["firstname"], user["familyname"],user["password"],user["sex"],user["city"], user["country"]):
-			return json.dumps({"Success" : True, "Message": "Successfully signed up"})
-		else:
-			return json.dumps({"Success" : False, "Message": "Something went wrong"})
-	else:
-		return json.dumps({"Success" : False, "Message": "User already exists"})
+    	if database_helper.insert_user(user["email"], user["firstname"], user["familyname"],user["password"],user["sex"],user["city"], user["country"]):
+
+            for othersock in sockets.items():
+                male, female = calculateGender()
+                if othersock[1] is not None:
+                    othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - (len(sockets))), "male":male,"female":female}))
+
+            return json.dumps({"Success" : True, "Message": "Successfully signed up"})
+    	else:
+    		return json.dumps({"Success" : False, "Message": "Something went wrong"})
+    else:
+    	return json.dumps({"Success" : False, "Message": "User already exists"})
 
 @app.route('/signout', methods=['POST'])
 def sign_out():
@@ -109,7 +134,7 @@ def get_user_data_by_email():
     #data = request.json
     token = request.headers.get('token')
     email = request.headers.get('email')
-    print(email)
+    print("hehehahskjdhah sjda ",email)
     return data_by_email(token, email)
 
 def data_by_email(token, email):
@@ -193,7 +218,8 @@ def api():
     try:
 
         data = json.loads(websocket.receive())
-        token = data["token"]
+        email = data["email"]
+        '''
         email = database_helper.find_inlogged(token)
 
         if email is not None:
@@ -214,28 +240,30 @@ def api():
                 male, female = calculateGender()
                 if othersock[1] is not None:
                     othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets)), "male":male,"female":female}))
+        '''
+        male, female = calculateGender()
+        sockets[email] = websocket
+        websocket.send(json.dumps({"success": True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets)), "male":male,"female":female, "male":male,"female":female}));
 
-            websocket.send(json.dumps({"success": True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets)), "male":male,"female":female, "male":male,"female":female}));
+        #websocket.send(json.dumps({"success":True, "updateloggedin":True, "number":len(sockets)}))
 
+        while True:
+            data = websocket.receive()
             #websocket.send(json.dumps({"success":True, "updateloggedin":True, "number":len(sockets)}))
+            if data is None:
+                del sockets[email]
+                male, female = calculateGender()
+                for othersock in sockets.items():
+                    if othersock[1] is not None:
+                        othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets)), "male":male,"female":female}))
 
-            while True:
-                data = websocket.receive()
-                #websocket.send(json.dumps({"success":True, "updateloggedin":True, "number":len(sockets)}))
-                if data is None:
-                    del sockets[token]
-                    male, female = calculateGender()
-                    for othersock in sockets.items():
-                        if othersock[1] is not None:
-                            othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets)), "male":male,"female":female}))
-
-                    websocket.close();
-                    return json.dumps({"success": False, "messages":"connection closed"})
+                websocket.close();
+                return json.dumps({"success": False, "messages":"connection closed"})
 
 
     except WebSocketError as e:
         print("error")
-        del sockets[otherToken]
+        del sockets[email]
         male, female = calculateGender()
         for othersock in sockets.items():
             if othersock[1] is not None:
@@ -264,7 +292,6 @@ def regapi():
         data = json.loads(websocket.receive())
         if(data["success"]):
             male, female = calculateGender()
-            print("hej", len(sockets.items()))
             for othersock in sockets.items():
                 if othersock[1] is not None:
                     othersock[1].send(json.dumps({"success":True, "updateloggedin":True, "online":len(sockets), "offline":(database_helper.amount_registered() - len(sockets)), "male":male,"female":female}))

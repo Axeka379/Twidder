@@ -26,7 +26,9 @@ window.onload = function(){
         document.getElementById("homeArea").innerHTML = homeview + oldview;
         chartUsers = initChart(0, 0, "online", "offline", "doughnut-chart", "number of people online/offline");
         chartUsersGender = initChart(0, 0, "male", "female", "doughnut-chart-gender", "Amount of male/female");
-        conSocket(token);
+        console.log("khasdhask " + info["Success"]);
+        console.log("hej " + info["data"]["email"]);
+        conSocket(info["data"]["email"]);
 
 
 
@@ -118,8 +120,9 @@ functionsignup = function(){
         message = JSON.parse(xhttp.responseText);
         console.log(message["Success"]);
         if(message["Success"]){
-          conSocketReg();
+          //conSocketReg();
         }
+        document.getElementById("signuperror").innerHTML = message["Message"];
       }
     };
     xhttp.open("POST", "/signup", true);
@@ -127,8 +130,8 @@ functionsignup = function(){
     xhttp.send(JSON.stringify(login_object));
 
     //var message = serverstub.signUp(login_object);
-    document.getElementById("signuperror").innerHTML = message["message"];
-    return message["success"];
+
+    //return message["success"];
   }else {
     document.getElementById("signuperror").innerHTML = "passwords don't match";
     return false;
@@ -458,11 +461,12 @@ var socket;
 var chartUsers;
 var chartUsersGender
 
-conSocket = function(token){
+conSocket = function(email){
   socket = new WebSocket("ws://" + document.domain + ":5000/socket");
   var data = {
-    "token":token
+    "email":email
   };
+  console.log(email);
 
 
   socket.onopen = function(){
