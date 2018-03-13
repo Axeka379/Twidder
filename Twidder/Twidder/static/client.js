@@ -15,6 +15,9 @@ window.onload = function(){
   if (token) {
     view = document.getElementById("loggedinview").innerHTML;
 
+    var login_object = {
+      "email":""
+    };
     var info;
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
@@ -29,6 +32,26 @@ window.onload = function(){
         console.log("khasdhask " + info["Success"]);
         console.log("hej " + info["data"]["email"]);
         conSocket(info["data"]["email"]);
+        login_object["email"] = info["data"]["email"];
+
+
+
+        var data;
+        var xhttp2 = new XMLHttpRequest();
+        xhttp2.onreadystatechange = function() {
+          if (this.readyState == 4 && this.status == 200) {
+            data = JSON.parse(xhttp2.responseText);
+
+
+          }
+        };
+        xhttp2.open("POST", "/reload", true);
+        xhttp2.setRequestHeader("Content-Type", "application/json");
+        xhttp2.send(JSON.stringify(login_object));
+
+
+
+
 
 
 
