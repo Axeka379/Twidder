@@ -35,11 +35,11 @@ def query_db(query, args=(), one=False):
 
 
 #insert a user into the database
-def insert_user(email, firstname, familyname, password, sex, city, country):
+def insert_user(email, firstname, familyname, password, sex, city, country, salt):
 	#do we need this? result = []
 
 	try:
-		cursor = g.db.execute("INSERT INTO users VALUES(?,?,?,?,?,?,?)",[email, firstname, familyname, password, sex, city, country])
+		cursor = g.db.execute("INSERT INTO users VALUES(?,?,?,?,?,?,?,?)",[email, firstname, familyname, password, sex, city, country, salt])
 		g.db.commit()
 
 		return True
@@ -60,7 +60,7 @@ def find_user(email):
 		result.append({'email':rows[index][0], 'firstname':rows[index][1],
 			'familyname':rows[index][2], 'password':rows[index][3],
 			'sex':rows[index][4], 'city':rows[index][5],
-			'country':rows[index][6]})
+			'country':rows[index][6], 'salt':rows[index][7]})
 	return (result[0] if result else None)
 
 
@@ -68,10 +68,10 @@ def find_user(email):
 
 def remove_user(email):
 	#connect = connect_db()
-
 	cursor = g.db.execute("DELETE FROM users WHERE email =?", [email])
 	g.db.commit()
 	return cursor.lastrowid
+
 
 
 
@@ -104,6 +104,7 @@ def update_password(email, password):
 
 def insert_token(token, email):
 	try:
+		remove_token_mail(email)
 		cursor = g.db.execute("INSERT INTO tokenlist VALUES(?,?)" , [token, email])
 		g.db.commit()
 		return True
@@ -116,6 +117,12 @@ def find_inlogged(token):
 	cursor.close()
 	return (result[0][0] if result else None)
 
+def find_inlogged_mail(email):
+    cursor = g.db.execute("SELECT * FROM tokenlist WHERE email=?", [email], )
+    result = cursor.fetchone()
+    return result
+
+
 def find_token(email):
 	cursor = g.db.execute("SELECT token FROM tokenlist WHERE email = ?", [email])
 	result = cursor.fetchall()
@@ -124,6 +131,10 @@ def find_token(email):
 
 def remove_token(token):
 	cursor = g.db.execute("DELETE FROM tokenlist WHERE token = ?", [token])
+	g.db.commit()
+
+def remove_token_mail(email):
+	cursor = g.db.execute("DELETE FROM tokenlist WHERE email = ?", [email])
 	g.db.commit()
 
 

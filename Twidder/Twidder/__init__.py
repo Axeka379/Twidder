@@ -5,7 +5,7 @@ from geventwebsocket import WebSocketError
 
 import database_helper as dh
 
-import uuid
+import hashlib, uuid
 import json
 
 
@@ -37,16 +37,31 @@ def sign_in():
     data = request.json
     email = data["email"]
     password = data["password"]
+    hash = data["hash"]
+
+
+    #hash_check2 = hashlib.sha512(hash).hexdigest()
+    hash_check = hashlib.sha512(email+password).hexdigest()
+
+    if(hash_check != hash):
+    	return json.dumps({"Success": False, "message": "Invalid request"})
+
 
     #database_helper.delete_logged_in_by_email(email)
+    result = database_helper.find_user(email)
+    print(result)
+    if result is not None: # and database_helper.find_user(email)["password"] == password:
 
-    if database_helper.find_user(email) is not None and database_helper.find_user(email)["password"] == password:
+        hashed_password = hashlib.sha512(password + database_helper.find_user(email)["salt"]).hexdigest()
 
-        print("after find user")
-        token = str(uuid.uuid4())
-        database_helper.insert_token(token, email)
-        print("after insert token")
-        return json.dumps({"Success": True, "message": "Successfully signed in", "data":token})
+        if hashed_password == database_helper.find_user(email)["password"]:
+            print("after find user")
+            token = str(uuid.uuid4())
+            database_helper.insert_token(token, email)
+            print("after insert token")
+            return json.dumps({"Success": True, "message": "Successfully signed in", "data":token})
+        else:
+    	    return json.dumps({"Success": False, "message": "Wrong username or password"})
 
     else:
     	return json.dumps({"Success": False, "message": "Wrong username or password"})
@@ -89,9 +104,9 @@ def sign_up():
     	return json.dumps({"Success" : False, "Message": "Bad input"})
     if database_helper.find_user(user['email']) is None:
 
-
-
-    	if database_helper.insert_user(user["email"], user["firstname"], user["familyname"],user["password"],user["sex"],user["city"], user["country"]):
+        salt = uuid.uuid4().hex
+        password_hash = hashlib.sha512(user["password"] + salt).hexdigest()
+    	if database_helper.insert_user(user["email"], user["firstname"] ,user["familyname"] ,password_hash ,user["sex"],user["city"], user["country"], salt):
 
             for othersock in sockets.items():
                 male, female = calculateGender()
@@ -119,19 +134,39 @@ def sign_out():
 @app.route('/changepass', methods=['POST'])
 def Change_password():
     data = request.json
-    token = data["token"]
+    hash = data["hash"]
     oldPassword = data["oldpassword"]
     newPassword = data["newpassword"]
-    if database_helper.find_inlogged(token) is not None:
-    	email = database_helper.find_inlogged(token)
-    	if oldPassword == database_helper.find_user(email)["password"]:
-    		database_helper.update_password(email, newPassword)
+    email = data["email"]
+
+    token = database_helper.find_inlogged_mail(email)
+
+    hash_check = hashlib.sha512(oldPassword+newPassword+token[0]).hexdigest()
+
+    if(hash_check != hash):
+        return json.dumps({"Success": False, "message": "Invalid request"})
+
+
+
+    newPasswordHashed = hashlib.sha512(newPassword + database_helper.find_user(email)["salt"]).hexdigest()
+
+    oldPasswordHashed = hashlib.sha512(oldPassword + database_helper.find_user(email)["salt"]).hexdigest()
+    if database_helper.find_inlogged_mail(email) is not None:
+    	if oldPasswordHashed == database_helper.find_user(email)["password"]:
+    		database_helper.update_password(email, newPasswordHashed)
     		return json.dumps({"Success": True, "message": "Password changed."})
     	else:
 	        return json.dumps({"Success": False, "message": "Wrong password."})
     else:
     	return Json.dumps({"Success": False, "message": "You are not logged in."})
 
+
+def create_hash(password, salt):
+    return hashlib.sha512(password + salt).hexdigest()
+
+
+def check_hash(hash, params, token):
+    return hashlib.sha512(params + token).hexdigest() == hash
 
 @app.route('/databytoken', methods=['GET'])
 def get_user_data_by_token():
@@ -145,7 +180,6 @@ def get_user_data_by_email():
     #data = request.json
     token = request.headers.get('token')
     email = request.headers.get('email')
-    print("hehehahskjdhah sjda ",email)
     return data_by_email(token, email)
 
 def data_by_email(token, email):
@@ -328,6 +362,9 @@ def calculateGender():
             female += 1
 
     return male, female
+
+def check_hash(hash, params, token):
+    return hashlib.sha512(params + token).hexdigest() == hash
 
 
 #@app.route("/")

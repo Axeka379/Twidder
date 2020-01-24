@@ -7,6 +7,8 @@ window.onbeforeunload = function(){
   //functionlogout();
 }
 
+var userEmail = null;
+
 window.onload = function(){
 
   var view;
@@ -34,8 +36,6 @@ window.onload = function(){
         conSocket(info["data"]["email"]);
         login_object["email"] = info["data"]["email"];
 
-
-
         var data;
         var xhttp2 = new XMLHttpRequest();
         xhttp2.onreadystatechange = function() {
@@ -48,13 +48,6 @@ window.onload = function(){
         xhttp2.open("POST", "/reload", true);
         xhttp2.setRequestHeader("Content-Type", "application/json");
         xhttp2.send(JSON.stringify(login_object));
-
-
-
-
-
-
-
 
       }
     };
@@ -161,13 +154,20 @@ functionsignup = function(){
   }
 };
 
+function createHash(userToken){
+  hash =  CryptoJS.SHA512(userToken);
+    return hash.toString();
+}
 
 functionsignin = function(){
-  //var user = document.getElementById("emailsignin").value;
-  //var pass = document.getElementById("passwordsignin").value;
+  var email = document.getElementById("emailsignin").value;
+  var params = email;
+  params += document.getElementById("passwordsignin").value;
+  var hash = (CryptoJS.SHA512(params)).toString();
   var login_object = {
     "email":document.getElementById("emailsignin").value,
-    "password":document.getElementById("passwordsignin").value
+    "password":document.getElementById("passwordsignin").value,
+    "hash":hash
   };
   //console.log(user);
   //console.log(pass);
@@ -179,11 +179,11 @@ functionsignin = function(){
       message = JSON.parse(xhttp.responseText);
       document.getElementById("signinerror").innerHTML = message["message"];
       document.getElementById("signinerror").innerHTML = message["message"];
-
+      userEmail = email;
       localStorage.setItem("token", message["data"]);
 
       if (message["Success"]) {
-        window.onload();
+          window.onload();
       }
     }
   };
@@ -191,11 +191,6 @@ functionsignin = function(){
   xhttp.setRequestHeader("Content-Type", "application/json");
   xhttp.send(JSON.stringify(login_object));
 
-  //var message = serverstub.signIn(user, pass);
-
-
-  //print(message["data"])
-  //return message["success"];
 };
 
 functionHome = function(){
@@ -219,15 +214,22 @@ functionchangepsw = function(){
   var pass1 = document.getElementById("newPassword").value;
   var pass2 = document.getElementById("newPasswordrpt").value;
 
+  var params = oldpass;
+  params += pass1;
+  params += localStorage.getItem("token");
+  var hash = (CryptoJS.SHA512(params)).toString();
+
   console.log(pass1);
   console.log(pass2);
   if (pass1 === pass2) {
     if(oldpass != pass1){
 
       var send_object = {
-        "token":localStorage.getItem("token"),
+        //"token":localStorage.getItem("token"),
+        "email":userEmail,
         "oldpassword":oldpass,
-        "newpassword":pass1
+        "newpassword":pass1,
+        "hash":hash
       };
       var message;
       var xhttp = new XMLHttpRequest();
@@ -260,6 +262,8 @@ functionchangepsw = function(){
 functionlogout = function(){
   socket.close();
 
+
+
   var send_object = {
     "token":localStorage.getItem("token")
   };
@@ -288,10 +292,16 @@ functionuploadmes = function(){
   document.getElementById("submittext").value = "";
   insertText(text, "thewall");
 
+  var params = localStorage.getItem("token");
+  params += text;
+  params += localStorage.getItem("email");
+  var hash = (CryptoJS.SHA512(params)).toString();
+
   var send_object = {
     "token":localStorage.getItem("token"),
     "messages":text,
-    "receiver":localStorage.getItem("email")
+    "receiver":localStorage.getItem("email"),
+    "hash":hash
   };
   var message;
   var xhttp = new XMLHttpRequest();
@@ -441,12 +451,19 @@ sendMessageToEmail = function(){
   var email = localStorage.getItem("browse");
   console.log(email);
 
+  var params = localStorage.getItem("token");
+  params += text;
+  params += localStorage.getItem("email");
+  var hash = (CryptoJS.SHA512(params)).toString();
+
 
   var send_object = {
     "token":localStorage.getItem("token"),
     "messages":text,
-    "receiver":email
+    "receiver":email,
+    "hash":hash
   };
+
   var message;
   var xhttp = new XMLHttpRequest();
   xhttp.onreadystatechange = function() {
@@ -463,21 +480,8 @@ sendMessageToEmail = function(){
 
   //serverstub.postMessage(localStorage.getItem("token"), text, email)
   insertText(text, "thewallOther");
-  /*
-  var info;
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function() {
-    if (this.readyState == 4 && this.status == 200) {
-      info = JSON.parse(xhttp.responseText);
 
-    }
-  };
-  xhttp.open("GET", "/databytoken", true);
-  xhttp.setRequestHeader("token", localStorage.getItem("token"));
-  xhttp.send();
-*/
 
-  //insertText(serverstub.getUserDataByToken(localStorage.getItem("token"))["data"].email, text, "thewallOther");
 }
 
 var socket;
@@ -485,7 +489,7 @@ var chartUsers;
 var chartUsersGender
 
 conSocket = function(email){
-  socket = new WebSocket("ws://" + document.domain + ":5000/socket");
+  socket = new WebSocket("ws://" + document.domain + ":5001/socket");
   var data = {
     "email":email
   };
@@ -524,7 +528,7 @@ conSocket = function(email){
 
 
 conSocketReg = function(){
-  socket = new WebSocket("ws://" + document.domain + ":5000/regsocket");
+  socket = new WebSocket("ws://" + document.domain + ":5001/regsocket");
   var data = {
     "success": true
   };

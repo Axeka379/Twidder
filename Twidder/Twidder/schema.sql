@@ -9,7 +9,8 @@ CREATE TABLE users (
 	password text NOT NULL,
 	sex text NOT NULL,
 	city text NOT NULL,
-	country text NOT NULL
+	country text NOT NULL,
+	salt VARCHAR(50)
 );
 
 CREATE TABLE messages (
