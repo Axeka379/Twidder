@@ -73,39 +73,43 @@ window.onload = function(){
 
 
 
-
-
-  //code that is executed as the page is loaded.
-  //You shall put your own custom code here.
-  //window.alert() is not allowed to be used in your implementation.
-  //window.alert("Hello TDDD97!");
 };
 
 
 profileInfo = function(info){
-  localStorage.setItem("email", info["data"].email);
-  var view = "<table style ='width:20%'>" +
-    "<tr>" +
-      "<th>Email: </th> <td> " + info["data"].email +" </td> " +
-    "</tr>" +
-    "<tr>" +
-      "<th>First name: </th> <td> " + info["data"].firstname +" </td> " +
-    "</tr>" +
-    "<tr>" +
-      "<th>Last name: </th> <td> " + info["data"].familyname +" </td> " +
-    "</tr>" +
-    "<tr>" +
-      "<th>Gender: </th> <td> " + info["data"].sex +" </td> " +
-    "</tr>" +
-    "<tr>" +
-      "<th>City: </th> <td> " + info["data"].city +" </td> " +
-    "</tr>" +
-    "<tr>" +
-      "<th>Country: </th> <td> " + info["data"].country +" </td> " +
-    "</tr>" +
-    "</table>";
 
-    return view;
+
+  localStorage.setItem("email", info["data"].email);
+  //var cUser = Handlebars.compile(info["data"]);
+  var someData = info["data"];
+  //console.log(Handlebars.registerHelper('somedata', someData));
+  //console.log(somedata2);
+  //someData = Handlebars.compile(somedata2);
+  //console.log(someData);
+
+
+  //var cM = Handlebars.compile(someData);
+  //console.log("BITCH");
+  var template = Handlebars.compile("Handlebars {{doesWhat}}</b>");
+  console.log(template({doesWhat: info["data"].email }));
+
+  var view = Handlebars.compile("<table style ='width:20%'>" +
+    "<tr>" +
+      "<th>Email: </th> <td> {{email}} </td> </tr> <tr><th>First name: </th> <td> {{firstname}}" +
+      "</td></tr><tr><th>Last name: </th> <td> {{lastname}}"+
+      "</td></tr><tr><th>Gender: </th> <td> {{gender}}"+
+      "</td></tr><tr><th>City: </th> <td> {{city}}"+
+      "</td></tr><tr><th>Country: </th><td>"+
+      "{{country}} </td></tr></table>");
+    view2 = view({email: info["data"].email,
+  firstname: info["data"].firstname,
+  lastname: info["data"].familyname,
+  gender: info["data"].sex,
+  city: info["data"].city,
+  country:  info["data"].country
+  });
+    console.log(view2);
+    return view2;
 }
 
 
@@ -372,6 +376,10 @@ functionReloadMessageOther = function()
     if (this.readyState == 4 && this.status == 200) {
       data = JSON.parse(xhttp.responseText);
       var messages = data["data"];
+      var m = document.getElementById("m").innerHTML;
+      var cM = Handlebars.compile("m");
+      document.getElementById("allmessages").innerHTML = cM({messages: message});
+
       var chatArea = document.getElementById("thewallOther");
       chatArea.innerHTML = "";
       insertText(messages, "thewallOther");

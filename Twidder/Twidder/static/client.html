@@ -7,17 +7,12 @@
 <script src="static/serverstub.js" type="text/javascript"></script>
 <script type="text/javascript" src="static/sha512rollup.js"></script>
 <!-- <script type="text/javascript" src="static/sha512.js"></script> -->
+<script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
+
 <script type="text/view" id="welcomeview">
       <div id="maincontainer">
-
-
-
         <div id="logo">
-
         </div>
-
-
-
         <div id="login">
             <form id="loginform" onsubmit="functionsignin(); return false;">
                 <div class="inner">
@@ -201,12 +196,24 @@
         <button type="submit">submit</button>
       </form>
 
+      <script id="m" type="text/x-handlebars-template">
+        <ul>
+        {{#each message}}
+              <li>{{this.[1]}} says:<br> {{this.[3]}}</li>
+              <br><br>
+          {{else}}
+              <p>No messages yet!</p>
+          {{/each}}
+        </ul>
+      </script>
+
+<!--
       <div id="wall">
         <textarea id="thewallOther" rows="38" cols="100"readonly> </textarea>
         <button onclick="functionReloadMessageOther();"> Reload</button>
       </div>
-    </script>
-
+-->
+</script>
 
 
 
