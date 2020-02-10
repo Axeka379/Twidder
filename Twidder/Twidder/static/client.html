@@ -6,6 +6,9 @@
 <script src="static/client.js" type="text/javascript"></script>
 <script src="static/serverstub.js" type="text/javascript"></script>
 <script type="text/javascript" src="static/sha512rollup.js"></script>
+<script src="https://unpkg.com/page/page.js"></script>
+
+
 <!-- <script type="text/javascript" src="static/sha512.js"></script> -->
 <script src="https://cdn.jsdelivr.net/npm/handlebars@latest/dist/handlebars.js"></script>
 
@@ -94,17 +97,27 @@
     <script type="text/view" id="loggedinview">
 
 
-        <div id="menu" >
-          <div id="menudiv">
+      <div id="menu" >
+
+        <div id="menudiv" >
+          <div id="home" class="menu">
             <button id="home" onclick="functionHome();"><h1>Home</h1></button>
           </div>
-          <div id="menudiv">
+        </div>
+
+        <div id="menudiv" >
+          <div id="browse" class="menu">
             <button id="browse" onclick="functionBrowse();"><h1>Browse</h1></button>
           </div>
-          <div id="menudiv">
+        </div>
+
+        <div id="menudiv" >
+          <div id="account" class="menu">
             <button id="account" onclick="functionAccount();"><h1>Account</h1></button>
           </div>
         </div>
+
+      </div>
 
 
 

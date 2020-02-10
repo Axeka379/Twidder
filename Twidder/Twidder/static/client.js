@@ -9,6 +9,7 @@ window.onbeforeunload = function(){
 
 var userEmail = null;
 
+console.log("HELOOOOOOO");
 window.onload = function(){
 
   var view;
@@ -16,6 +17,8 @@ window.onload = function(){
   token = localStorage.getItem("token")
   if (token) {
     view = document.getElementById("loggedinview").innerHTML;
+
+
 
     var login_object = {
       "email":""
@@ -27,12 +30,12 @@ window.onload = function(){
         info = JSON.parse(xhttp.responseText);
         homeview = profileInfo(info);
         document.getElementById("content").innerHTML = view;
+
+
         var oldview = document.getElementById("homeArea").innerHTML;
         document.getElementById("homeArea").innerHTML = homeview + oldview;
         chartUsers = initChart(0, 0, "online", "offline", "doughnut-chart", "number of people online/offline");
         chartUsersGender = initChart(0, 0, "male", "female", "doughnut-chart-gender", "Amount of male/female");
-        console.log("khasdhask " + info["Success"]);
-        console.log("hej " + info["data"]["email"]);
         conSocket(info["data"]["email"]);
         login_object["email"] = info["data"]["email"];
 
@@ -41,8 +44,6 @@ window.onload = function(){
         xhttp2.onreadystatechange = function() {
           if (this.readyState == 4 && this.status == 200) {
             data = JSON.parse(xhttp2.responseText);
-
-
           }
         };
         xhttp2.open("POST", "/reload", true);
@@ -50,21 +51,37 @@ window.onload = function(){
         xhttp2.send(JSON.stringify(login_object));
 
       }
+
+    console.log("lol");
+    functionReloadMessage();
+
+    var savedPageStateURL = window.location.pathname;
+    let boxes = Array.from(document.getElementsByClassName("menu"));
+    console.log(boxes);
+
+    boxes.forEach(b => {
+            let id = b.id;
+            b.addEventListener('click', e => {
+                history.pushState({id}, null, `./${id}`);
+                selectBox(id, boxes);
+            });
+        });
+
+
+    window.addEventListener('popstate', e => {
+          selectBox(e.state.id, boxes);
+      });
+
+    history.replaceState({id: null}, null, './');
+
+    functionHome();
     };
+
     xhttp.open("GET", "/databytoken", true);
     xhttp.setRequestHeader("token", localStorage.getItem("token"));
     xhttp.send();
 
-    functionReloadMessage();
-    //var info = serverstub.getUserDataByToken(localStorage.getItem("token"));
 
-    /*homeview = profileInfo(info);
-
-      document.getElementById("content").innerHTML = view;
-      var oldview = document.getElementById("homeArea").innerHTML;
-      document.getElementById("homeArea").innerHTML = homeview + oldview;
-      functionReloadMessage();
-      */
 
   }else {
     document.getElementById("content").innerHTML = document.getElementById("welcomeview").innerHTML;
@@ -74,7 +91,25 @@ window.onload = function(){
 
 
 };
-
+function selectBox(id, boxes) {
+    boxes.forEach(b => {
+        if (b.id === id) {
+            console.log(`${b.id}`);
+            switch (b.id) {
+                case "home":
+                    functionHome();
+                    break;
+                case "browse":
+                    functionBrowse();
+                    break;
+                case "account":
+                    functionAccount();
+                    break;
+            }
+        }
+        b.classList.toggle('active', b.id === id);
+    });
+  }
 
 profileInfo = function(info){
 
@@ -101,6 +136,7 @@ profileInfo = function(info){
       "</td></tr><tr><th>City: </th> <td> {{city}}"+
       "</td></tr><tr><th>Country: </th><td>"+
       "{{country}} </td></tr></table>");
+
     view2 = view({email: info["data"].email,
   firstname: info["data"].firstname,
   lastname: info["data"].familyname,
@@ -187,7 +223,7 @@ functionsignin = function(){
       localStorage.setItem("token", message["data"]);
 
       if (message["Success"]) {
-          window.onload();
+        window.onload();
       }
     }
   };
@@ -198,16 +234,26 @@ functionsignin = function(){
 };
 
 functionHome = function(){
+  /* id = document.getElementById("home").id;
+   history.pushState({id}, null, "/home")
+  //history.pushState({page})
+*/
   document.getElementById("homeArea").style.display = "inline";
   document.getElementById("browseArea").style.display = "none";
   document.getElementById("accountArea").style.display = "none";
 };
 functionBrowse = function(){
+  /*id = document.getElementById("browse").id;
+  history.pushState({id}, null, "/browse")
+*/
   document.getElementById("homeArea").style.display = "none";
   document.getElementById("browseArea").style.display = "inline";
   document.getElementById("accountArea").style.display = "none";
 };
 functionAccount = function(){
+/*  id = document.getElementById("account").id;
+  history.pushState({id}, null, "/account")
+*/
   document.getElementById("homeArea").style.display = "none";
   document.getElementById("browseArea").style.display = "none";
   document.getElementById("accountArea").style.display = "inline";
