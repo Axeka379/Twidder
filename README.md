@@ -2,6 +2,6 @@
 
 Course in TDDD97/Web programming to construct a basic social media app called Twidder. 
 
-Front end uses HTML, CSS Javascript.
+Frontend uses HTML, CSS Javascript.
 
-Back end uses Python, SQL, Flask.
+Backend uses Python, SQL, Flask.
