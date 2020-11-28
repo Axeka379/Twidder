@@ -4,5 +4,4 @@ Course in TDDD97/Web programming to construct a basic social media app called Tw
 
 Front end uses HTML, CSS Javascript.
 
-
 Back end uses Python, SQL, Flask.
